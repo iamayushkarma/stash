@@ -1,1 +1,42 @@
 node_modules
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+out/
+.cache/
+
+
+# Logs
+*.log
+logs/
+debug.log
+*.gz
+
+# Environment
+.env
+.env.*.local
+
+# Chrome Extension
+extension/build/
+extension/dist/
+*.crx
+*.pem
+
+# Testing / Coverage
+coverage/
+.nyc_output/
+
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
+*.idea/
+.vscode/
