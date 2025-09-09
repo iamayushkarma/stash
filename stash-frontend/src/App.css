@@ -9,12 +9,12 @@ body {
   /* brand color */
   --color-primary: #0883fe;
 
-  /* background */
+  /* background color */
   --color-bg-light-primary: #ffffff;
   --color-bg-dark-primary: #010409;
 
-  --color-bg-light-secondary: #f2f2f3;
-  --color-bg-dark-secondary: #15181c;
+  --color-bg-light-secondary: #f5f6f8;
+  --color-bg-dark-secondary: #0f1114;
 
   /* text color */
   --color-text-light-primary: #030712;
@@ -22,4 +22,8 @@ body {
 
   --color-text-light-secondary: #364153;
   --color-text-dark-secondary: #d1d5dc;
+
+  /* border color */
+  --color-border-light: #d1d5db;
+  --color-border-dark: #585858;
 }
