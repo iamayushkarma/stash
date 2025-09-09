@@ -5,11 +5,18 @@ import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
 import { useForm } from "react-hook-form";
 
 function Register() {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
 
-  handleSubmit = (e) => {
-    e.prevent.default();
+  const onSubmit = (data) => {
+    console.log(data);
+    reset();
   };
+  const errorClass = "text-error text-sm relative bottom-[0.65rem]";
   return (
     <div className="bg-bg-light-primary select-none dark:bg-bg-dark-primary text-text-light-primary dark:text-text-dark-primary w-full flex">
       {/* left ui side  */}
@@ -24,34 +31,79 @@ function Register() {
             Create a new account 👋
           </p>
 
-          <form className="relative w-11/12" action="">
-            {/* email */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="relative w-11/12"
+            action=""
+          >
+            {/* username */}
             <Input
               type="text"
-              name="username"
+              {...register("username", {
+                required: "Username is required",
+                minLength: {
+                  value: 3,
+                  message: "Minimum length is 3 characters",
+                },
+                maxLength: {
+                  value: 20,
+                  message: "Maximum length is 20 characters",
+                },
+                pattern: {
+                  value:
+                    /^[a-zA-Z0-9](?!.*[._]{2})[a-zA-Z0-9._]{1,18}[a-zA-Z0-9]$/,
+                  message:
+                    "Username must be alphanumeric and can contain . or _ but no consecutive special characters, and cannot start or end with special characters",
+                },
+              })}
               label="Username"
               placeholder="Enter your username"
             />
+            {errors.username && (
+              <p className={errorClass}>{errors.username.message}</p>
+            )}
             {/* email */}
             <Input
               type="email"
-              name="email"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Invalid email address format",
+                },
+              })}
               label="Email"
               placeholder="Enter your email"
             />
+            {errors.email && (
+              <p className={errorClass}>{errors.email.message}</p>
+            )}
+
             {/* password */}
             <Input
               type="password"
-              name="password"
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+                maxLength: {
+                  value: 30,
+                  message: "Password must be at most 30 characters",
+                },
+              })}
               label="Password"
               placeholder="Enter your password"
             />
+            {errors.password && (
+              <p className={errorClass}>{errors.password.message}</p>
+            )}
             {/* submit button */}
 
             <div>
               <Button
                 type="Submit"
-                onSubmit={() => handleSubmit()}
                 text="Register"
                 className="w-full mt-3 py-2"
               />

@@ -26,4 +26,7 @@ body {
   /* border color */
   --color-border-light: #d1d5db;
   --color-border-dark: #585858;
+
+  /* Feedback Colors */
+  --color-error: #ff2c2c;
 }

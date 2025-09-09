@@ -2,8 +2,20 @@ import Button from "../../utils/ui/Button";
 import Input from "../../utils/ui/Input";
 import { FcGoogle } from "react-icons/fc";
 import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
+import { useForm } from "react-hook-form";
 
 function Login() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+    reset();
+  };
   return (
     <div className="flex dark:bg-bg-dark-primary bg-bg-light-primary">
       {/* left ui side  */}
