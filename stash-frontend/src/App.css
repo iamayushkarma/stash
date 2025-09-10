@@ -4,7 +4,27 @@
 
 body {
   font-family: "Roboto", sans-serif;
+  @apply bg-bg-dark-primary text-text-dark-primary;
 }
+
+:root {
+  --autofill-bg: #e6f7ff;
+  --autofill-text: #0c0e12;
+}
+
+.dark {
+  --autofill-bg: #0f1114;
+  --autofill-text: #fff;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--autofill-bg) inset !important;
+  -webkit-text-fill-color: var(--autofill-text) !important;
+}
+
 @theme {
   /* brand color */
   --color-primary: #0883fe;

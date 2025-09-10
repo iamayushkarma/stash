@@ -1,11 +1,14 @@
+import {
+  MainLayout,
+  Home,
+  Login,
+  Register,
+  PageNotFound,
+  Dashboard,
+} from "./index.js";
 import "./App.css";
 import { ThemeProvider } from "./context/ThemeContext";
-import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/Home";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
-import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   return (
@@ -18,7 +21,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
-
+            <Route path="/user/dashboard" element={<Dashboard />} />
             {/* Handle unknown routes */}
             <Route path="*" element={<PageNotFound />} />
           </Routes>

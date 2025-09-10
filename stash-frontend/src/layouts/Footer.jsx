@@ -3,10 +3,16 @@ import logoLightSecondary from "/logo/stash-logo-light-secondary.png";
 import logoDarkSecondary from "/logo/stash-logo-dark-secondary.png";
 import Button from "../utils/ui/Button";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Mail, Github } from "lucide-react";
 
 function Footer() {
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const navigateToDashboard = () => {
+    navigate("/login");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Docs", href: "/docs" },
@@ -50,9 +56,13 @@ function Footer() {
           </div>
 
           {/* contact */}
-          <Link to="/login">
-            <Button className="text-[.8rem] px-4 py-1.5" text="Try now" />
-          </Link>
+
+          <Button
+            onClick={navigateToDashboard}
+            className="text-[.8rem] px-4 py-1.5"
+            text="Try now"
+          />
+
           {/* social media */}
           <div className="flex items-center ml-1 py-6 gap-3 dark:text-text-dark-secondary text-text-light-secondary ">
             <a

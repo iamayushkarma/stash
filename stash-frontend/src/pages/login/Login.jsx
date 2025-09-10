@@ -3,8 +3,16 @@ import Input from "../../utils/ui/Input";
 import { FcGoogle } from "react-icons/fc";
 import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { serverUrl } from "../constents";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../hooks/useUserContext";
 
 function Login() {
+  const { login } = useUserContext();
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -12,10 +20,32 @@ function Login() {
     reset,
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post(`${serverUrl}auth/login`, data, {
+        withCredentials: true,
+      });
+      console.log("Response data:", response.data);
+      const responseData = response.data.data;
+      const { user, accessToken, refreshToken } = responseData;
+
+      console.log("Access Token:", accessToken);
+      console.log("Refresh Token:", refreshToken);
+      console.log("User Info:", user);
+
+      login({
+        ...user,
+        accessToken,
+        refreshToken,
+      });
+      reset();
+      navigate("/user/dashboard");
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      setMessage(error.response?.data.message || error.message);
+    }
   };
+  const errorClass = "text-error text-sm relative bottom-[0.65rem]";
   return (
     <div className="flex dark:bg-bg-dark-primary bg-bg-light-primary">
       {/* left ui side  */}
@@ -30,21 +60,48 @@ function Login() {
             Hi, Wellcome back 👋
           </p>
 
-          <form className="relative w-11/12" action="">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="relative w-11/12"
+            action=""
+          >
             {/* email */}
             <Input
               type="email"
-              name="email"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Invalid email address format",
+                },
+              })}
               label="Email"
               placeholder="Enter your email"
             />
+            {errors.email && (
+              <p className={errorClass}>{errors.email.message}</p>
+            )}
             {/* password */}
             <Input
               type="password"
-              name="password"
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+                maxLength: {
+                  value: 30,
+                  message: "Password must be at most 30 characters",
+                },
+              })}
               label="Password"
               placeholder="Enter your password"
             />
+            {errors.password && (
+              <p className={errorClass}>{errors.password.message}</p>
+            )}
+            {message && <div className={errorClass}>{message}</div>}
             {/* submit button */}
 
             <div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { EyeOff, Eye } from "lucide-react";
+import "../../App.css";
 
 const Input = React.forwardRef(
   (
@@ -30,7 +31,7 @@ const Input = React.forwardRef(
           ref={ref}
           required={required}
           placeholder={placeholder}
-          className={`${className} p-2 mb-4 rounded-md w-full placeholder:text-[.9rem] md:placeholder:text-[1rem] focus:outline-none border-[0.5px] dark:border-border-dark border-border-dark dark:bg-bg-dark-secondary bg-bg-light-secondary`}
+          className={`${className} p-2 mb-4 rounded-md w-full placeholder:text-[.9rem] md:placeholder:text-[1rem] focus:outline-none  [&:-webkit-autofill]:bg-gray-800 border-[0.5px] dark:border-border-dark border-border-dark dark:bg-bg-dark-secondary bg-bg-light-secondary`}
           {...rest}
         />
         {type === "password" && (

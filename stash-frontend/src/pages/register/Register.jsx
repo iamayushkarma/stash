@@ -3,8 +3,16 @@ import Input from "../../utils/ui/Input";
 import { FcGoogle } from "react-icons/fc";
 import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { serverUrl } from "../constents";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../hooks/useUserContext";
 
 function Register() {
+  const { login } = useUserContext();
+  const navigate = useNavigate();
+  const [message, setMessage] = useState("");
   const {
     register,
     handleSubmit,
@@ -12,9 +20,31 @@ function Register() {
     reset,
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    reset();
+  const onSubmit = async function (data) {
+    try {
+      const response = await axios.post(`${serverUrl}auth/register`, data, {
+        withCredentials: true,
+      });
+      console.log("Response data:", response.data);
+
+      const responseData = response.data.data;
+      const { user, accessToken, refreshToken } = responseData;
+
+      console.log("Access Token:", accessToken);
+      console.log("Refresh Token:", refreshToken);
+      console.log("User Info:", user);
+      login({
+        ...user,
+        accessToken,
+        refreshToken,
+      });
+
+      navigate("/user/dashboard");
+      reset();
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      setMessage(error.response?.data.message || error.message);
+    }
   };
   const errorClass = "text-error text-sm relative bottom-[0.65rem]";
   return (
@@ -99,6 +129,7 @@ function Register() {
             {errors.password && (
               <p className={errorClass}>{errors.password.message}</p>
             )}
+            {message && <div className={errorClass}>{message}</div>}
             {/* submit button */}
 
             <div>
