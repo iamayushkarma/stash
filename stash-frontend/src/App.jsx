@@ -5,6 +5,11 @@ import {
   Register,
   PageNotFound,
   Dashboard,
+  Snippets,
+  Screenshots,
+  Categories,
+  Help,
+  DashboardHome,
 } from "./index.js";
 import "./App.css";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -21,7 +26,13 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
-            <Route path="/user/dashboard" element={<Dashboard />} />
+            <Route path="/user/dashboard" element={<Dashboard />}>
+              <Route index element={<DashboardHome />} />
+              <Route path="snippets" element={<Snippets />} />
+              <Route path="screenshots" element={<Screenshots />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="help" element={<Help />} />
+            </Route>
             {/* Handle unknown routes */}
             <Route path="*" element={<PageNotFound />} />
           </Routes>

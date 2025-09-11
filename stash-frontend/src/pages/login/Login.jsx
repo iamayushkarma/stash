@@ -22,12 +22,13 @@ function Login() {
 
   const getApiUrl = () => {
     const hostname = window.location.hostname;
-    const port = 8000;
+    const port = import.meta.env.VITE_BACKEND_API_PORT;
 
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return `http://localhost:${port}/api/v1/`;
     }
-    return `http://${hostname}:${port}/api/v1/`;
+    const protocol = window.location.protocol;
+    return `${protocol}//${hostname}:${port}/api/v1/`;
   };
 
   const API_BASE_URL = getApiUrl();

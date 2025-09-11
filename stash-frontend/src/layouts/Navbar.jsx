@@ -16,7 +16,7 @@ import { useState } from "react";
 import { ToggleMode } from "../utils/ui/ThemeToggleBtn";
 
 function Navbar() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [openMenu, setOpenMenu] = useState(false);
   const openMobileMenu = () => {
     setOpenMenu((openMenu) => !openMenu);

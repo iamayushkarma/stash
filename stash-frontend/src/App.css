@@ -49,4 +49,8 @@ input:-webkit-autofill:active {
 
   /* Feedback Colors */
   --color-error: #ff2c2c;
+
+  /* accent color */
+  --color-bg-accent-dark: #caf0f8;
+  --color-bg-accent-light: #cae9ff;
 }
