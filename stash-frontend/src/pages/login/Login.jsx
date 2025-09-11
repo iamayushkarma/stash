@@ -20,9 +20,22 @@ function Login() {
     reset,
   } = useForm();
 
+  const getApiUrl = () => {
+    const hostname = window.location.hostname;
+    const port = 8000;
+
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return `http://localhost:${port}/api/v1/`;
+    }
+    return `http://${hostname}:${port}/api/v1/`;
+  };
+
+  const API_BASE_URL = getApiUrl();
+  console.log(API_BASE_URL);
+
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(`${serverUrl}auth/login`, data, {
+      const response = await axios.post(`${API_BASE_URL}auth/login`, data, {
         withCredentials: true,
       });
       console.log("Response data:", response.data);

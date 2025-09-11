@@ -1,9 +1,14 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { ApiError } from "./utils/api-error.js";
 
 const app = express();
+
+dotenv.config({
+  path: "./.env",
+});
 
 // cors configurations
 app.use(
@@ -14,7 +19,6 @@ app.use(
     allowedHeaders: ["Content-type", "Authorization"],
   })
 );
-
 app.get("/", (req, res) => {
   res.send("Stash");
 });
