@@ -29,14 +29,14 @@ function Dashboard() {
       {/* sidebar */}
       <div
         onClick={() => setCloseMobileSidebar((prev) => !prev)}
-        className={`sm:hidden  z-[99999999] text-text-light-primary dark:text-text-dark-primary absolute left-1 top-1 p-3 ${closeMobileSidebar ? "" : "left-[14rem]"}`}
+        className={`sm:hidden  z-[999999] text-text-light-primary dark:text-text-dark-primary absolute left-1 top-1 p-3 ${closeMobileSidebar ? "" : "left-[14rem]"}`}
       >
         {closeMobileSidebar ? <Menu size={20} /> : <X size={20} />}
       </div>
       {isMobile ? (
         <div
           ref={modalRef}
-          className={`${closeMobileSidebar ? "hidden" : "flex"} z-[99999]  fixed w-[17rem] bg-bg-light-secondary dark:bg-bg-dark-secondary`}
+          className={`${closeMobileSidebar ? "hidden" : "flex"} z-[99999]  fixed inset-0 w-[17rem] bg-bg-light-secondary dark:bg-bg-dark-secondary`}
         >
           <MobileDashboardSidebar
             closeSidebar={() => setCloseMobileSidebar(true)}
@@ -49,7 +49,7 @@ function Dashboard() {
       )}
       {/* pages */}
       <div
-        className={`w-full transition-all ${closeMobileSidebar ? "blur-[0px]" : "blur-[1px] pointer-events-none"} `}
+        className={`w-full transition-all ${closeMobileSidebar ? "blur-[0px]" : "blur-[4px] pointer-events-none"} `}
       >
         <DashboardNavbar />
 

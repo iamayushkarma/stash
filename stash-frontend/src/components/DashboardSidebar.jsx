@@ -63,8 +63,8 @@ function DashboardSidebar({ className }) {
                   `flex gap-2 items-center p-2 rounded-lg transition-all duration-200
      ${
        isActive
-         ? "bg-primary/10 text-text-light-primary dark:text-text-dark-primary"
-         : "text-text-light-secondary/80 dark:text-text-dark-secondary/80 hover:bg-primary/10 dark:hover:bg-primary/5 hover:text-text-light-primary hover:dark:text-text-dark-primary"
+         ? "text-text-light-primary dark:text-text-dark-primary font-bold"
+         : "text-text-light-secondary/80 dark:text-text-dark-secondary/80  hover:text-text-light-primary hover:dark:text-text-dark-primary"
      }`
                 }
               >
@@ -76,7 +76,7 @@ function DashboardSidebar({ className }) {
         </ul>
       </div>
       <div className="h-[8%] p-4 text-text-light-secondary dark:text-text-dark-secondary cursor-pointer">
-        <div className="flex group h-8 bottom-2 items-center gap-1.5 relative">
+        <div className="flex hover:font-normal group h-8 bottom-2 items-center gap-1.5 relative">
           <span>
             <Settings size={17} />
           </span>

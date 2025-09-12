@@ -1,0 +1,21 @@
+/* Firefox */
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.7) transparent;
+}
+.scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
+/* Chrome, Edge, Safari */
+.scrollbar::-webkit-scrollbar {
+  width: 2px; /* Thinner than before */
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.7);
+  border-radius: 9999px; /* Fully rounded */
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* No track background */
+}
