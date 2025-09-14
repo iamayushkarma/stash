@@ -35,11 +35,12 @@ const registerUser = asyncHandler(async (req, res) => {
       []
     );
   }
-  // creating user id not found in db
+  // creating user id if not found in db
   const user = await User.create({
     username,
     email,
     password,
+    authType: "local",
   });
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user._id
@@ -105,5 +106,48 @@ const loginUser = asyncHandler(async (req, res) => {
       )
     );
 });
+// user login with google
+const loginWithGoogle = asyncHandler(async (req, res) => {
+  try {
+    console.log("req.body:", req.body);
+    const { name, email, googleId } = req.body;
+    if (!email) {
+      throw new ApiError(400, "Email is required!");
+    }
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        username: name,
+        email,
+        authType: "google",
+        googleId,
+      });
+    }
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id
+    );
 
-export { registerUser, loginUser };
+    const createdUser = await User.findById(user._id).select("-refreshToken");
+
+    return res.status(200).json({
+      statusCode: 200,
+      success: true,
+      message: "User logged in successfully via Google!",
+      data: { user: createdUser, accessToken, refreshToken },
+    });
+  } catch (error) {
+    console.error("🔥 Google login error details:", {
+      message: error.message,
+      stack: error.stack,
+      errors: error.errors,
+    });
+
+    res.status(500).json({
+      success: false,
+      message: "User registration failed!",
+      error: error.message,
+    });
+  }
+});
+
+export { registerUser, loginUser, loginWithGoogle };

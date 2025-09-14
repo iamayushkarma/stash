@@ -1,4 +1,4 @@
-import React from "react";
+import { SquareBottomDashedScissors, FileImage } from "lucide-react";
 import { useUserContext } from "../../hooks/useUserContext";
 
 function DashboardHome() {
@@ -28,7 +28,7 @@ function DashboardHome() {
     } else if (hour >= 17 && hour < 21) {
       return "hope you had a great day ⭐";
     } else {
-      return "rest well tonight  🌙";
+      return "rest well tonight 🌙";
     }
   };
   const username = String(user.username);
@@ -54,6 +54,33 @@ function DashboardHome() {
         <span></span>
       </div>
       {/* total count of snippets */}
+      <div className="py-3 md:py-6 cursor-default">
+        <div className="flex gap-2">
+          <div className="w-36 flex flex-col justify-center px-3 py-1 border-1 bg-bg-light-secondary dark:bg-bg-dark-secondary text-text-light-secondary dark:text-text-dark-secondary border-border-light dark:border-border-dark rounded-lg">
+            <div className="flex gap-2 items-center mb-1">
+              <span>
+                <SquareBottomDashedScissors className="w-3.5" />
+              </span>
+              <span>Snippets</span>
+            </div>
+            <div className="font-semibold text-[1.2rem] text-text-light-primary dark:text-text-dark-primary">
+              123
+            </div>
+          </div>
+
+          <div className="w-36 flex flex-col justify-center px-3 py-1 border-1 bg-bg-light-secondary dark:bg-bg-dark-secondary text-text-light-secondary dark:text-text-dark-secondary border-border-light dark:border-border-dark rounded-lg">
+            <div className="flex gap-2 items-center mb-1">
+              <span>
+                <FileImage className="w-3.5" />
+              </span>
+              <span>Images</span>
+            </div>
+            <div className="font-semibold text-text-light-primary dark:text-text-dark-primary text-[1.2rem]">
+              45
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

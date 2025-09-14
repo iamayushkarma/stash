@@ -7,7 +7,6 @@ const userSchema = new Schema(
     username: {
       type: String,
       required: [true, "Username is required"],
-      unique: true,
       trim: true,
       index: true,
       minlength: 3,
@@ -21,11 +20,12 @@ const userSchema = new Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
     },
+    authType: { type: String, enum: ["local", "google"], default: "local" },
     password: {
       type: String,
-      required: [true, "Password is required"],
       minlength: 6,
     },
+    googleId: { type: String },
     refreshToken: {
       type: String,
     },

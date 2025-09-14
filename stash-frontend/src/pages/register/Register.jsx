@@ -1,6 +1,5 @@
 import Button from "../../utils/ui/Button";
 import Input from "../../utils/ui/Input";
-import { FcGoogle } from "react-icons/fc";
 import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
 import { useForm } from "react-hook-form";
 import axios from "axios";
@@ -8,6 +7,7 @@ import { serverUrl } from "../constents";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../hooks/useUserContext";
+import LoginWithGoogleBtn from "../../utils/ui/LoginWithGoogleBtn";
 
 function Register() {
   const { login } = useUserContext();
@@ -164,14 +164,7 @@ function Register() {
             </div>
 
             <div className="py-2 mt-3 w-full cursor-pointer">
-              <div className="p-2 border border-border-dark dark:border-border-dark bg-bg-light-secondary dark:bg-bg-dark-secondary flex gap-2 items-center justify-center rounded-xl">
-                <span>
-                  <FcGoogle />
-                </span>
-                <span className="text-text-light-primary dark:text-text-dark-primary">
-                  Google
-                </span>
-              </div>
+              <LoginWithGoogleBtn />
             </div>
             <div className="mt-4 text-[.9rem] md:text-[1rem] dark:text-text-dark-secondary text-text-light-secondary">
               Already have an account?{" "}

@@ -1,5 +1,3 @@
-import securityImage from "/images/security-image.png";
-
 function AuthWelcomeSidebar() {
   const descriptions = [
     "Great ideas start with simple organization. Keep your thoughts, inspirations, and creations in one place and let clarity lead the way.",
@@ -22,7 +20,18 @@ function AuthWelcomeSidebar() {
         </div>
         {/* image */}
         <div className="my-4">
-          <img className="w-96" src={securityImage} />
+          <picture>
+            <source
+              className="w-102"
+              srcset="/images/security-image.webp"
+              type="image/webp"
+            />
+            <img
+              className="w-102"
+              src="/images/security-image.png"
+              alt="Descriptive text"
+            />
+          </picture>
         </div>
         {/* message */}
         <div className="w-11/12 px-2 mt-8">

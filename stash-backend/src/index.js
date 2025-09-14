@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 // starts server only on mongodb connection
 connectDB()
   .then(() =>
-    app.listen(port, () =>
+    app.listen(port, "0.0.0.0", () =>
       console.log(
         chalk.green.bold.italic(`Server is running on http://localhost:${port}`)
       )
