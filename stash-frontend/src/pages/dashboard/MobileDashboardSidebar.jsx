@@ -1,8 +1,9 @@
-import { useRef, useState, useEffect } from "react";
-import logoLight from "/logo/stash-logo-light-secondary.png";
-import logoDark from "/logo/stash-logo-dark-secondary.png";
-import { Link, NavLink } from "react-router-dom";
 import { useTheme } from "../../hooks/useTheme";
+import { Link, NavLink } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
+import LogoutBtn from "../../utils/ui/Buttons/LogoutBtn";
+import logoDark from "/logo/stash-logo-dark-secondary.png";
+import logoLight from "/logo/stash-logo-light-secondary.png";
 import {
   Home,
   SquareBottomDashedScissors,
@@ -12,7 +13,11 @@ import {
   Settings,
   CircleUserRound,
 } from "lucide-react";
+
 function MobileDashboardSidebar({ closeSidebar }) {
+  const { theme } = useTheme();
+  const [openSettingToggle, setOpenSettingToggle] = useState(false);
+  const textPrimary = "text-text-light-primary dark:text-text-dark-primary";
   const settingsRef = useRef(null);
   const navLinks = [
     { label: "Home", icon: <Home size={17} />, href: "" },
@@ -44,10 +49,6 @@ function MobileDashboardSidebar({ closeSidebar }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const { theme } = useTheme();
-  const [openSettingToggle, setOpenSettingToggle] = useState(false);
-  const textPrimary = "text-text-light-primary dark:text-text-dark-primary";
   return (
     <div className="w-full h-svh flex flex-col justify-between select-none border-r-[.5px] border-r-border-light dark:border-r-border-dark">
       {/* logo */}
@@ -110,7 +111,9 @@ function MobileDashboardSidebar({ closeSidebar }) {
               <CircleUserRound size={15} />
               Account
             </span>
-            <span className="px-1 ml-5 text-error">Logout</span>
+            <span className="px-1 md:ml-5 text-error">
+              <LogoutBtn />
+            </span>
           </div>
         </div>
       </div>

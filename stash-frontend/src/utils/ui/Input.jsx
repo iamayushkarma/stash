@@ -1,6 +1,6 @@
+import "../../App.css";
 import React, { useState } from "react";
 import { EyeOff, Eye } from "lucide-react";
-import "../../App.css";
 
 const Input = React.forwardRef(
   (

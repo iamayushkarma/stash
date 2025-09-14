@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Plus, Search } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { ToggleMode } from "../utils/ui/ThemeToggleBtn";
+import { ToggleMode } from "../utils/ui/Buttons/ThemeToggleBtn";
 import { useUserContext } from "../hooks/useUserContext";
 import { toggleSearchModal } from "../redux/slices/searchModalSlice/searchModal.slice";
 

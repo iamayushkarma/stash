@@ -1,5 +1,5 @@
-import { useTheme } from "../../hooks/useTheme";
 import { SunMedium, Moon } from "lucide-react";
+import { useTheme } from "../../../hooks/useTheme";
 
 export const ToggleMode = ({ className }) => {
   const { theme, toggleTheme } = useTheme();

@@ -1,10 +1,10 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../Firebase";
-import { FcGoogle } from "react-icons/fc";
-import { serverUrl } from "../../pages/constents";
-import { useUserContext } from "../../hooks/useUserContext";
 import axios from "axios";
+import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../../Firebase";
+import { serverUrl } from "../../../pages/constents";
+import { useUserContext } from "../../../hooks/useUserContext";
 
 function LoginWithGoogleBtn() {
   const { login } = useUserContext();
@@ -28,10 +28,6 @@ function LoginWithGoogleBtn() {
       );
       const resData = await apiResponse.data;
       const { user: userFromBackend, accessToken, refreshToken } = resData.data;
-      // console.log("user data:", resData);
-      console.log("user data accessToken:", accessToken);
-      console.log("user data refreshToken:", refreshToken);
-      console.log("users data", userFromBackend);
 
       login({
         ...userFromBackend,
@@ -41,7 +37,7 @@ function LoginWithGoogleBtn() {
       navigate("/user/dashboard");
       reset();
     } catch (error) {
-      console.log("error with google login", error);
+      console.error("error with google login", error);
     }
   };
   return (

@@ -1,7 +1,10 @@
-import { useTheme } from "../hooks/useTheme";
-import logoLight from "/logo/stash-logo-light.jpg";
-import logoDark from "/logo/stash-logo-dark.png";
+import { useState } from "react";
+import Button from "../utils/ui/Buttons/Button";
 import { Link } from "react-router-dom";
+import { useTheme } from "../hooks/useTheme";
+import logoDark from "/logo/stash-logo-dark.png";
+import logoLight from "/logo/stash-logo-light.jpg";
+import { ToggleMode } from "../utils/ui/Buttons/ThemeToggleBtn";
 import {
   Home,
   Star,
@@ -11,9 +14,6 @@ import {
   ContactRound,
   BookOpenText,
 } from "lucide-react";
-import Button from "../utils/ui/Button";
-import { useState } from "react";
-import { ToggleMode } from "../utils/ui/ThemeToggleBtn";
 
 function Navbar() {
   const { theme } = useTheme();

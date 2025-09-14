@@ -1,7 +1,8 @@
-import logoLight from "/logo/stash-logo-light-secondary.png";
-import logoDark from "/logo/stash-logo-dark-secondary.png";
-import { Link, NavLink } from "react-router-dom";
 import { useTheme } from "../hooks/useTheme";
+import { Link, NavLink } from "react-router-dom";
+import LogoutBtn from "../utils/ui/Buttons/LogoutBtn";
+import logoDark from "/logo/stash-logo-dark-secondary.png";
+import logoLight from "/logo/stash-logo-light-secondary.png";
 import {
   Home,
   SquareBottomDashedScissors,
@@ -33,6 +34,7 @@ function DashboardSidebar({ className }) {
   ];
   const { theme } = useTheme();
   const textPrimary = "text-text-light-primary dark:text-text-dark-primary";
+
   return (
     <div className="w-full h-svh flex flex-col justify-between select-none">
       {/* logo */}
@@ -86,7 +88,9 @@ function DashboardSidebar({ className }) {
               <CircleUserRound size={15} />
               Account
             </span>
-            <span className="px-1 ml-5 text-error">Logout</span>
+            <div>
+              <LogoutBtn />
+            </div>
           </div>
         </div>
       </div>

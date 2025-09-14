@@ -1,4 +1,4 @@
-import Button from "../utils/ui/Button";
+import Button from "../utils/ui/Buttons/Button";
 import { Link } from "react-router-dom";
 
 function PageNotFound() {

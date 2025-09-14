@@ -1,13 +1,12 @@
-import Button from "../../utils/ui/Button";
-import Input from "../../utils/ui/Input";
-import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
-import { useForm } from "react-hook-form";
 import axios from "axios";
-import { serverUrl } from "../constents";
 import { useState } from "react";
+import Input from "../../utils/ui/Input";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import Button from "../../utils/ui/Buttons/Button";
 import { useUserContext } from "../../hooks/useUserContext";
-import LoginWithGoogleBtn from "../../utils/ui/LoginWithGoogleBtn";
+import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
+import LoginWithGoogleBtn from "../../utils/ui/Buttons/LoginWithGoogleBtn";
 
 function Register() {
   const { login } = useUserContext();

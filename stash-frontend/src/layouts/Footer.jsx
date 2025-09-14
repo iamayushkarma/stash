@@ -1,10 +1,9 @@
-import { useTheme } from "../hooks/useTheme";
-import logoLightSecondary from "/logo/stash-logo-light-secondary.png";
-import logoDarkSecondary from "/logo/stash-logo-dark-secondary.png";
-import Button from "../utils/ui/Button";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { Mail, Github } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
+import { useNavigate } from "react-router-dom";
+import Button from "../utils/ui/Buttons/Button";
+import logoDarkSecondary from "/logo/stash-logo-dark-secondary.png";
+import logoLightSecondary from "/logo/stash-logo-light-secondary.png";
 
 function Footer() {
   const { theme, toggleTheme } = useTheme();

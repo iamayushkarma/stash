@@ -1,10 +1,10 @@
+import { Menu, X } from "lucide-react";
 import { Outlet } from "react-router-dom";
-import DashboardNavbar from "../../components/DashboardNavbar";
-import DashboardSidebar from "../../components/DashboardSidebar";
+import { useEffect, useRef, useState } from "react";
 import { useUserContext } from "../../hooks/useUserContext";
 import MobileDashboardSidebar from "./MobileDashboardSidebar";
-import { useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
+import DashboardNavbar from "../../components/DashboardNavbar";
+import DashboardSidebar from "../../components/DashboardSidebar";
 
 function Dashboard() {
   const modalRef = useRef(null);

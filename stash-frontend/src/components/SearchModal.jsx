@@ -1,8 +1,8 @@
 import { createPortal } from "react-dom";
-import { useDispatch } from "react-redux";
-import { toggleSearchModal } from "../redux/slices/searchModalSlice/searchModal.slice";
 import { Search, X } from "lucide-react";
+import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
+import { toggleSearchModal } from "../redux/slices/searchModalSlice/searchModal.slice";
 import "./components.css";
 
 const codingWords = [

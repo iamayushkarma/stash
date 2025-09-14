@@ -149,5 +149,22 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
     });
   }
 });
+// user logout
+const logoutUser = asyncHandler(async (req, res) => {
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
 
-export { registerUser, loginUser, loginWithGoogle };
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json({
+      statusCode: 200,
+      success: true,
+      message: "User logged out successfully!",
+    });
+});
+
+export { registerUser, loginUser, loginWithGoogle, logoutUser };
