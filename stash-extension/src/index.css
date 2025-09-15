@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+#react-chrome-extension-root {
+  position: fixed;
+  top: 10rem;
+  right: 20rem;
+  z-index: 2147483647; /* Use the highest possible z-index */
+}
+/*  tailwind darkMode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+:root {
+  --autofill-bg: #e6f7ff;
+  --autofill-text: #0c0e12;
+}
+
+.dark {
+  --autofill-bg: #06080c;
+  --autofill-text: #fff;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--autofill-bg) inset !important;
+  -webkit-text-fill-color: var(--autofill-text) !important;
+}
+
+@theme {
+  /* brand color */
+  --color-primary: #0883fe;
+
+  /* background color */
+  --color-bg-light-primary: #ffffff;
+  --color-bg-dark-primary: #010409;
+
+  --color-bg-light-secondary: #f5f6f8;
+  --color-bg-dark-secondary: #0f1114;
+
+  /* text color */
+  --color-text-light-primary: #030712;
+  --color-text-dark-primary: #ffffff;
+
+  --color-text-light-secondary: #364153;
+  --color-text-dark-secondary: #d1d5dc;
+
+  /* border color */
+  --color-border-light: #d1d5db;
+  --color-border-dark: #585858;
+
+  /* Feedback Colors */
+  --color-error: #ff2c2c;
+
+  /* accent color */
+  --color-bg-accent-dark: #caf0f8;
+  --color-bg-accent-light: #cae9ff;
+}
+
+/* Apply custom scrollbar globally or target specific element */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.5);
+  border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 100, 0.8);
+}
