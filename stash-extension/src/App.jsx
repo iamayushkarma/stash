@@ -3,6 +3,7 @@ import "./index.css";
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { serverUrl } from "./constants";
+import { toast, Toaster } from "react-hot-toast";
 
 function App() {
   const modalRef = useRef(null);
@@ -190,7 +191,8 @@ function App() {
     try {
       const { token } = await chrome.storage.local.get("token");
       if (!token) {
-        alert("Authentication error: You are not logged in.");
+        // alert("Authentication error: You are not logged in.");
+        toast.error("You are not logged in.");
         setIsSaving(false);
         return;
       }
@@ -209,11 +211,13 @@ function App() {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to save the stash.");
       }
-      alert("Stash saved successfully!");
+      // alert("Stash saved successfully!");
+      toast.success("Saved successfully!");
       handleClose();
     } catch (error) {
       console.error("Failed to save stash:", error);
-      alert(`Error: ${error.message}`);
+      // alert(`Error: ${error.message}`);
+      toast.error(`${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -228,6 +232,7 @@ function App() {
 
   return (
     <div className="w-full h-svh flex items-center justify-center">
+      <Toaster position="top-center" reverseOrder={false} />
       <form
         ref={modalRef}
         tabIndex="-1"
@@ -255,10 +260,10 @@ function App() {
               />
             )}
           </div>
-          <div className="text-xs text-[0.8rem] mr-[.5rem] mt-2 dark:text-text-dark-secondary text-text-light-secondary truncate">
+          <div className="text-xs text-[0.8rem] ml-[.3rem] mt-2 mb-[2px]   dark:text-text-dark-secondary text-text-light-secondary truncate">
             from {getHostname(sourceUrl)}
           </div>
-          <div className="py-2 pt-0 run build">
+          <div className="pb-2 pt-0 run build">
             <div className="relative inline-block w-full text-left">
               <input
                 type="text"
@@ -269,7 +274,7 @@ function App() {
                   setIsOpen(true);
                   fetchCategories();
                 }}
-                className="w-full px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200"
+                className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200"
                 placeholder="Select or type a category"
               />
               {isOpen && (
@@ -295,7 +300,7 @@ function App() {
                     onClick={handleAddCategory}
                     className="px-4 py-2 cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-bg-light-secondary dark:hover:bg-bg-dark-secondary"
                   >
-                    + Add "{inputValue}"
+                    + Add {inputValue}
                   </div>
                 </div>
               )}
@@ -312,7 +317,7 @@ function App() {
           </div>
           <textarea
             rows={4}
-            className="pb-8 h-20 resize-none rounded-lg px-3 py-2 border-1 bg-bg-light-secondary/30 dark:bg-bg-dark-secondary/30 dark:border-border-dark/60 border-border-light"
+            className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200 pb-8 h-20 resize-none "
             placeholder="Add a note (optional)"
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -337,7 +342,7 @@ export default App;
 const Input = ({ type, name, placeholder, className, value, onChange }) => {
   return (
     <input
-      className={`${className || ""} w-full rounded-lg px-3 py-2 border-1 bg-bg-light-secondary/30 dark:bg-bg-dark-secondary/30 dark:border-border-dark/60 border-border-light`}
+      className={`${className || ""} w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200`}
       type={type}
       name={name}
       value={value}

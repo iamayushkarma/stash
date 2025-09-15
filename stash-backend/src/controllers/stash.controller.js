@@ -16,10 +16,10 @@ cloudinary.config({
 
 const saveStash = asyncHandler(async (req, res) => {
   try {
-    const { title, category, type, content, note } = req.body;
+    const { title, category, type, content, note, sourceUrl } = req.body;
     const userId = req.user.id;
 
-    if (!title || !category || !type || !content) {
+    if (!title || !category || !type || !content || !sourceUrl) {
       return res.status(400).json({ message: "Missing required fields" });
     }
     let finalContent = content;
