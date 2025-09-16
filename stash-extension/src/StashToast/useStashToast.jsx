@@ -7,14 +7,21 @@ function useStashToast() {
   useEffect(() => {
     const div = document.createElement("div");
     div.id = stashToastId;
+    div.className = "stash-toast";
     div.style =
-      "position: fixed; right: 50%; transform: translate(50%, 2%); z-index: 99999999";
-    document.getElementsByTagName("body")[0].prepend(div);
+      "position: fixed; top: 1.5%; right: 50%; transform: translate(50%); z-index: 99999999";
+
+    document.body.prepend(div);
     setLoaded(true);
 
-    return () => document.getElementsByTagName("body")[0].removeChild(div);
+    return () => {
+      // The cleanup just removes the div
+      const element = document.getElementById(stashToastId);
+      if (element) {
+        document.body.removeChild(element);
+      }
+    };
   }, [stashToastId]);
-
   return { loaded, stashToastId };
 }
 

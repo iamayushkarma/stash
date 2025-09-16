@@ -1,13 +1,11 @@
-import { useState } from "react";
 import useStashToast from "./useStashToast";
 import ReactDom from "react-dom";
 import StashToastUi from "./StashToastUi";
 import { X, Lock, Check } from "lucide-react";
-import { forwardRef } from "react";
-import { useImperativeHandle } from "react";
-import { useEffect } from "react";
+import { forwardRef, useImperativeHandle, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const StashToast = forwardRef(({ autoClose, autoClosrTime = 1500 }, ref) => {
+const StashToast = forwardRef(({ autoClose, autoClosrTime = 2000 }, ref) => {
   const [toast, setToast] = useState([]);
   const { loaded, stashToastId } = useStashToast();
   const [removingToast, setRemovingToast] = useState("");
@@ -55,24 +53,40 @@ const StashToast = forwardRef(({ autoClose, autoClosrTime = 1500 }, ref) => {
     },
   }));
 
-  return loaded ? (
-    ReactDom.createPortal(
-      <div>
-        {toast.map((toast) => (
-          <StashToastUi
-            key={toast.id}
-            type={toast.type}
-            message={toast.message}
-            icon={toast.icon}
-            onClose={() => removeToast(toast.id)}
-          />
-        ))}
-      </div>,
-      document.getElementById(stashToastId)
-    )
-  ) : (
-    <></>
-  );
+  // StashToast.jsx (just the return part)
+
+  return loaded
+    ? ReactDom.createPortal(
+        <div>
+          {" "}
+          {/* Stack toasts from top */}
+          <AnimatePresence initial={false}>
+            {toast.map((t) => (
+              <motion.div
+                key={t.id}
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                style={{
+                  boxShadow:
+                    "0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.05)",
+                }}
+                className="mb-2 rounded-lg"
+              >
+                <StashToastUi
+                  type={t.type}
+                  message={t.message}
+                  icon={t.icon}
+                  onClose={() => removeToast(t.id)}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>,
+        document.getElementById(stashToastId)
+      )
+    : null;
 });
 
 export default StashToast;
