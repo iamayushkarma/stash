@@ -5,7 +5,7 @@ import { X, Lock, Check } from "lucide-react";
 import { forwardRef, useImperativeHandle, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const StashToast = forwardRef(({ autoClose, autoClosrTime = 2000 }, ref) => {
+const StashToast = forwardRef(({ autoClose, autoClosrTime = 1700 }, ref) => {
   const [toast, setToast] = useState([]);
   const { loaded, stashToastId } = useStashToast();
   const [removingToast, setRemovingToast] = useState("");
