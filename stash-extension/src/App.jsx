@@ -1,7 +1,6 @@
-// src/App.jsx
 import "./index.css";
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { X, Check, Lock, CircleX } from "lucide-react";
 import { serverUrl } from "./constants";
 import { toast, Toaster } from "react-hot-toast";
 
@@ -11,12 +10,12 @@ function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
+  const [error, setError] = useState({
+    bothFeild: "",
+  });
   const [inputValue, setInputValue] = useState("");
 
-  // ADDON: New state to track if we're saving 'text' or an 'image'
   const [stashType, setStashType] = useState("text");
-
-  // CHANGED: Renamed `selectedText` to `contentData` to be more generic
   const [contentData, setContentData] = useState("Loading...");
 
   const [note, setNote] = useState("");
@@ -92,7 +91,6 @@ function App() {
     const darkModeHandler = (e) => updateDarkMode(e.matches);
     mediaQuery.addEventListener("change", darkModeHandler);
 
-    // --- THIS IS THE NEW DATA FETCHING LOGIC ---
     // This function asks the background script for the data.
     const fetchData = () => {
       if (window.chrome?.runtime) {
@@ -115,6 +113,7 @@ function App() {
             setCategory("");
             setInputValue("");
             setNote("");
+            setError("");
             fetchCategories();
 
             // Make sure the modal is visible
@@ -171,7 +170,8 @@ function App() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (!title || !category) {
-      alert("Please fill in both title and category.");
+      setError({ bothFeild: "Please fill in both title and category." });
+      toast.success("Saved successfully!");
       return;
     }
     setIsSaving(true);
@@ -192,7 +192,18 @@ function App() {
       const { token } = await chrome.storage.local.get("token");
       if (!token) {
         // alert("Authentication error: You are not logged in.");
-        toast.error("You are not logged in.");
+        toast.error("You are not logged in.", {
+          icon: <Lock className="w-5 h-5 text-error" />,
+          style: {
+            background: "#ffffff",
+            color: "#364153",
+            border: "1px solid #f8f8f8",
+            display: "flex",
+            alignItems: "center",
+            gap: ".01rem",
+          },
+          duration: 3000,
+        });
         setIsSaving(false);
         return;
       }
@@ -211,18 +222,39 @@ function App() {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to save the stash.");
       }
-      // alert("Stash saved successfully!");
-      toast.success("Saved successfully!");
-      handleClose();
+      toast.success("Saved successfully!", {
+        icon: <Check size={20} />,
+        style: {
+          background: "#f0f9ff",
+          color: "#0c4a6e",
+          border: "1px solid #0883fe",
+          display: "flex",
+          alignItems: "center",
+          gap: ".01rem",
+        },
+        duration: 3000,
+      });
+      setInterval(() => {
+        handleClose();
+      }, 1000);
     } catch (error) {
       console.error("Failed to save stash:", error);
-      // alert(`Error: ${error.message}`);
-      toast.error(`${error.message}`);
+      toast.error(`${error.message}`, {
+        icon: <CircleX className="w-5 h-5 text-error" />,
+        style: {
+          background: "#ffffff",
+          color: "#364153",
+          border: "1px solid #f8f8f8",
+          display: "flex",
+          alignItems: "center",
+          gap: ".01rem",
+        },
+        duration: 3000,
+      });
     } finally {
       setIsSaving(false);
     }
   };
-
   const handleClose = () => {
     const rootElement = getRootElement();
     if (rootElement && rootElement.id === "react-chrome-extension-root") {
@@ -231,109 +263,125 @@ function App() {
   };
 
   return (
-    <div className="w-full h-svh flex items-center justify-center">
-      <Toaster position="top-center" reverseOrder={false} />
-      <form
-        ref={modalRef}
-        tabIndex="-1"
-        className="outline-none"
-        onSubmit={handleSave}
-      >
-        <div className="flex w-74 box-shadow-box flex-col p-3 border-1 bg-bg-light-primary dark:bg-bg-dark-primary dark:text-text-dark-primary text-text-light-primary dark:border-border-dark border-border-light rounded-lg">
-          <div className="flex items-center pb-4 w-full justify-between">
-            <span className="font-semibold md:text-lg">Stash</span>
-            <span onClick={handleClose} className="cursor-pointer">
-              <X size={16} />
-            </span>
-          </div>
-          <div className="w-full bg-bg-light-secondary/30 rounded-md dark:bg-bg-dark-secondary/50 dark:border-border-dark/50 border-1 border-border-light max-h-40 overflow-auto">
-            {stashType === "text" && (
-              <p className="p-2 text-sm whitespace-pre-wrap break-words">
-                {contentData}
-              </p>
-            )}
-            {stashType === "image" && (
-              <img
-                src={contentData}
-                alt="Stash preview"
-                className="w-full h-auto object-contain rounded"
-              />
-            )}
-          </div>
-          <div className="text-xs text-[0.8rem] ml-[.3rem] mt-2 mb-[2px]   dark:text-text-dark-secondary text-text-light-secondary truncate">
-            from {getHostname(sourceUrl)}
-          </div>
-          <div className="pb-2 pt-0 run build">
-            <div className="relative inline-block w-full text-left">
-              <input
-                type="text"
-                ref={inputRef}
-                value={category}
-                onChange={handleInputChange}
-                onFocus={() => {
-                  setIsOpen(true);
-                  fetchCategories();
-                }}
-                className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200"
-                placeholder="Select or type a category"
-              />
-              {isOpen && (
-                <div className="absolute mt-2 w-full bg-bg-light-primary dark:bg-bg-dark-primary border border-border-light dark:border-border-dark rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
-                  {options
-                    .filter(
-                      (option) =>
-                        option
-                          .toLowerCase()
-                          .includes(inputValue.toLowerCase()) &&
-                        option !== inputValue
-                    )
-                    .map((option) => (
-                      <div
-                        key={option}
-                        onClick={() => handleSelect(option)}
-                        className="px-4 py-2 cursor-pointer border-b-1 border-border-light dark:border-border-dark hover:bg-bg-light-secondary dark:hover:bg-bg-dark-secondary"
-                      >
-                        {option}
-                      </div>
-                    ))}
-                  <div
-                    onClick={handleAddCategory}
-                    className="px-4 py-2 cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-bg-light-secondary dark:hover:bg-bg-dark-secondary"
-                  >
-                    + Add {inputValue}
-                  </div>
-                </div>
+    <>
+      {/* <Toaster
+        position="top-center"
+        containerStyle={{
+          zIndex: 99999,
+        }}
+        reverseOrder={false}
+      /> */}
+
+      <Toaster position="top-center" containerStyle={{ zIndex: 999999 }} />
+
+      <div className="w-full h-svh flex items-center justify-center">
+        <form
+          ref={modalRef}
+          tabIndex="-1"
+          className="outline-none  text-base leading-normal"
+          onSubmit={handleSave}
+        >
+          <div className="flex w-74 box-shadow-box flex-col p-3 border-1 bg-bg-light-primary dark:bg-bg-dark-primary dark:text-text-dark-primary text-text-light-primary dark:border-border-dark border-border-light rounded-lg">
+            <div className="flex items-center pb-4 w-full justify-between">
+              <span className="font-semibold md:text-lg">Stash</span>
+              <span onClick={handleClose} className="cursor-pointer">
+                <X size={16} />
+              </span>
+            </div>
+            <div className="w-full bg-bg-light-secondary/30 rounded-md dark:bg-bg-dark-secondary/50 dark:border-border-dark/50 border-1 border-border-light max-h-40 overflow-auto">
+              {stashType === "text" && (
+                <p className="p-2 text-sm whitespace-pre-wrap break-words">
+                  {contentData}
+                </p>
+              )}
+              {stashType === "image" && (
+                <img
+                  src={contentData}
+                  alt="Stash preview"
+                  className="w-full h-auto object-contain rounded"
+                />
               )}
             </div>
+            <div className="text-xs text-[0.8rem] ml-[.3rem] mt-2 mb-[2px]   dark:text-text-dark-secondary text-text-light-secondary truncate">
+              from {getHostname(sourceUrl)}
+            </div>
+            <div className="pb-2 pt-0 run build">
+              <div className="relative inline-block w-full text-left">
+                <input
+                  type="text"
+                  ref={inputRef}
+                  value={category}
+                  onChange={handleInputChange}
+                  onFocus={() => {
+                    setIsOpen(true);
+                    fetchCategories();
+                  }}
+                  className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200"
+                  placeholder="Select or type a category"
+                />
+                {isOpen && (
+                  <div className="absolute mt-2 w-full bg-bg-light-primary dark:bg-bg-dark-primary border border-border-light dark:border-border-dark rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+                    {options
+                      .filter(
+                        (option) =>
+                          option
+                            .toLowerCase()
+                            .includes(inputValue.toLowerCase()) &&
+                          option !== inputValue
+                      )
+                      .map((option) => (
+                        <div
+                          key={option}
+                          onClick={() => handleSelect(option)}
+                          className="px-4 py-2 cursor-pointer border-b-1 border-border-light dark:border-border-dark hover:bg-bg-light-secondary dark:hover:bg-bg-dark-secondary"
+                        >
+                          {option}
+                        </div>
+                      ))}
+                    <div
+                      onClick={handleAddCategory}
+                      className="px-4 py-2 cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-bg-light-secondary dark:hover:bg-bg-dark-secondary"
+                    >
+                      + Add {inputValue}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="pb-2">
+              <Input
+                type="text"
+                name="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter a title"
+              />
+            </div>
+            {
+              <span className="text-[.74rem] ml-1 text-error">
+                {error.bothFeild}
+              </span>
+            }
+            <textarea
+              rows={4}
+              className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200 pb-8 h-20 resize-none "
+              placeholder="Add a note (optional)"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            ></textarea>
+            <div className="mt-6">
+              <button
+                className="w-full px-3 py-1.5 bg-primary text-text-dark-primary rounded-lg transition-all duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                type="submit"
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving..." : "Save"}
+              </button>
+            </div>
           </div>
-          <div className="pb-2">
-            <Input
-              type="text"
-              name="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter a title"
-            />
-          </div>
-          <textarea
-            rows={4}
-            className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200 pb-8 h-20 resize-none "
-            placeholder="Add a note (optional)"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          ></textarea>
-          <div className="mt-6">
-            <button
-              className="w-full px-3 py-1.5 bg-primary text-text-dark-primary rounded-lg transition-all duration-150 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              type="submit"
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : "Save"}
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 }
 
