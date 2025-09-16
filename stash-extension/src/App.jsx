@@ -1,12 +1,13 @@
 import "./index.css";
 import { useState, useEffect, useRef } from "react";
-import { X, Check, Lock, CircleX } from "lucide-react";
+import { X } from "lucide-react";
 import { serverUrl } from "./constants";
-import { toast, Toaster } from "react-hot-toast";
+import StashToast from "./StashToast/StashToast";
 
 function App() {
   const modalRef = useRef(null);
   const inputRef = useRef(null);
+  const toastRef = useRef(null);
   const [isSaving, setIsSaving] = useState(false);
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
@@ -36,6 +37,12 @@ function App() {
     } catch (error) {
       return url;
     }
+  };
+  const cerateToast = (type, message) => {
+    toastRef.current.addMessage({
+      type,
+      message,
+    });
   };
 
   const fetchCategories = async () => {
@@ -166,12 +173,15 @@ function App() {
     }
     setIsOpen(false);
   };
+  const autoClose = true;
+  const autoCloseTime = 3000;
 
   const handleSave = async (e) => {
     e.preventDefault();
     if (!title || !category) {
       setError({ bothFeild: "Please fill in both title and category." });
-      toast.success("Saved successfully!");
+      // toast.success("Saved successfully!");
+      cerateToast("error", "you are not logged in!");
       return;
     }
     setIsSaving(true);
@@ -191,19 +201,7 @@ function App() {
     try {
       const { token } = await chrome.storage.local.get("token");
       if (!token) {
-        // alert("Authentication error: You are not logged in.");
-        toast.error("You are not logged in.", {
-          icon: <Lock className="w-5 h-5 text-error" />,
-          style: {
-            background: "#ffffff",
-            color: "#364153",
-            border: "1px solid #f8f8f8",
-            display: "flex",
-            alignItems: "center",
-            gap: ".01rem",
-          },
-          duration: 3000,
-        });
+        cerateToast("loginFalse", "You are not logged in!");
         setIsSaving(false);
         return;
       }
@@ -222,35 +220,13 @@ function App() {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to save the stash.");
       }
-      toast.success("Saved successfully!", {
-        icon: <Check size={20} />,
-        style: {
-          background: "#f0f9ff",
-          color: "#0c4a6e",
-          border: "1px solid #0883fe",
-          display: "flex",
-          alignItems: "center",
-          gap: ".01rem",
-        },
-        duration: 3000,
-      });
-      setInterval(() => {
+      cerateToast("success", "Saved successfully!");
+      setTimeout(() => {
         handleClose();
       }, 1000);
     } catch (error) {
       console.error("Failed to save stash:", error);
-      toast.error(`${error.message}`, {
-        icon: <CircleX className="w-5 h-5 text-error" />,
-        style: {
-          background: "#ffffff",
-          color: "#364153",
-          border: "1px solid #f8f8f8",
-          display: "flex",
-          alignItems: "center",
-          gap: ".01rem",
-        },
-        duration: 3000,
-      });
+      cerateToast("error", `${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -264,16 +240,6 @@ function App() {
 
   return (
     <>
-      {/* <Toaster
-        position="top-center"
-        containerStyle={{
-          zIndex: 99999,
-        }}
-        reverseOrder={false}
-      /> */}
-
-      <Toaster position="top-center" containerStyle={{ zIndex: 999999 }} />
-
       <div className="w-full h-svh flex items-center justify-center">
         <form
           ref={modalRef}
@@ -380,6 +346,12 @@ function App() {
             </div>
           </div>
         </form>
+        {/* custom toast */}
+        <StashToast
+          ref={toastRef}
+          autoClose={autoClose}
+          autoCloseTime={autoCloseTime}
+        />
       </div>
     </>
   );
