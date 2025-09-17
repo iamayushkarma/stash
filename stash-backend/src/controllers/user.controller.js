@@ -26,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
   // for existing user
   const existingUser = await User.findOne({
-    $or: [{ email }, { password }],
+    $or: [{ email }, { username }],
   });
   if (existingUser) {
     throw new ApiError(
@@ -151,6 +151,14 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
 });
 // user logout
 const logoutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $unset: { refreshToken: 1 },
+    },
+    { new: true }
+  );
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -160,11 +168,12 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json({
-      statusCode: 200,
-      success: true,
-      message: "User logged out successfully!",
-    });
+    .json(new ApiResponse(200, {}, "User logged out successfully!"));
+  // .json({
+  //   statusCode: 200,
+  //   success: true,
+  //   message: "User logged out successfully!",
+  // });
 });
 
 export { registerUser, loginUser, loginWithGoogle, logoutUser };

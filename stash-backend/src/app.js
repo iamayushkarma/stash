@@ -73,7 +73,7 @@ app.use("/api/v1/auth", authRouter);
 // extension routes
 import stashRouter from "./routes/stash.route.js";
 
-app.use("/api/stashes", stashRouter);
+app.use("/api/v1/stashes", stashRouter);
 
 // global error handler
 app.use((err, req, res, next) => {

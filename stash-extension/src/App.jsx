@@ -56,7 +56,7 @@ function App() {
       }
       console.log("Debug 2: Token found, proceeding with fetch.");
 
-      const response = await fetch(`${serverUrl}api/stashes/categories`, {
+      const response = await fetch(`${serverUrl}api/v1/stashes/categories`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -207,7 +207,7 @@ function App() {
       }
 
       // CHANGED: The URL now points to your single, unified endpoint
-      const response = await fetch(`${serverUrl}api/stashes`, {
+      const response = await fetch(`${serverUrl}api/v1/stashes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
