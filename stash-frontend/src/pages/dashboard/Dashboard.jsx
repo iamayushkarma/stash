@@ -36,7 +36,7 @@ function Dashboard() {
       {isMobile ? (
         <div
           ref={modalRef}
-          className={`${closeMobileSidebar ? "hidden" : "flex"} z-[99999]  fixed inset-0 w-[17rem] bg-bg-light-secondary dark:bg-bg-dark-secondary`}
+          className={`${closeMobileSidebar ? "hidden" : "flex"} z-[99999]  fixed inset-0 w-[18rem] bg-bg-light-secondary dark:bg-bg-dark-secondary`}
         >
           <MobileDashboardSidebar
             closeSidebar={() => setCloseMobileSidebar(true)}
@@ -49,9 +49,11 @@ function Dashboard() {
       )}
       {/* pages */}
       <div
-        className={`w-full transition-all ${closeMobileSidebar ? "blur-[0px]" : "blur-[4px] pointer-events-none"} `}
+        className={`w-full h-svh overflow-y-auto transition-all ${closeMobileSidebar ? "blur-[0px]" : "blur-[4px] pointer-events-none"} `}
       >
-        <DashboardNavbar />
+        <div className="sticky top-0 z-50">
+          <DashboardNavbar />
+        </div>
 
         <main className="w-full max-sm:h-svh">
           <Outlet />

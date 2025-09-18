@@ -2,7 +2,7 @@ import { Stash } from "../models/stash.model.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { v2 as cloudinary } from "cloudinary"; // Import Cloudinary
 import dotenv from "dotenv";
-import { User } from "../models/user.model.js";
+import { io } from "../index.js";
 
 // This MUST be at the top
 dotenv.config({
@@ -15,6 +15,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// this api call saves user snippet data from the extension popup and saves it to mongoDB
 const saveStash = asyncHandler(async (req, res) => {
   try {
     const { title, category, type, content, note, sourceUrl } = req.body;
@@ -45,6 +46,7 @@ const saveStash = asyncHandler(async (req, res) => {
       note,
       sourceUrl,
     });
+    io.emit("newStash", newStash); // 🔥 send to all connected clients
 
     // Send a success response back to the extension
     res
@@ -61,6 +63,7 @@ const getCategories = asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const categories = await Stash.distinct("category", { user: userId });
 
+    // io.emit("newStash", categories); // 🔥 send to all connected clients
     res.status(200).json(categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -68,32 +71,14 @@ const getCategories = asyncHandler(async (req, res) => {
   }
 });
 
-const getUserStats = asyncHandler(async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const [totalStashes, imageCount, userCategories] = await Promise.all([
-      // Count stashes where the 'user' field matches the logged-in user's ID
-      Stash.countDocuments({ user: userId }),
-
-      // Count images where the 'user' matches AND the type is 'image'
-      Stash.countDocuments({ user: userId, type: "image" }),
-
-      // Get distinct categories only from stashes belonging to this user
-      Stash.distinct("category", { user: userId }),
-    ]);
-
-    const textCount = totalStashes - imageCount;
-    const stats = {
-      totalStashes: totalStashes,
-      totalImages: imageCount,
-      totalTexts: textCount,
-      uniqueCategories: userCategories.length,
-    };
-
-    res.status(200).json(stats);
-  } catch (error) {
-    console.log("error fetching stats", error);
-  }
+const getAllUserSnippets = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const allUsersSavedData = await Stash.find({ user: userId }).sort({
+    createdAt: -1,
+  });
+  // io.emit("newStash", allUsersSavedData);
+  res.status(200).json(allUsersSavedData);
 });
 
-export { saveStash, getCategories, getUserStats };
+export { saveStash, getCategories, getAllUserSnippets };
+// getAllUserSnippets;

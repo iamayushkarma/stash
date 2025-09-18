@@ -12,7 +12,7 @@ import {
   Settings,
   CircleUserRound,
 } from "lucide-react";
-function DashboardSidebar({ className }) {
+function DashboardSidebar() {
   const navLinks = [
     { label: "Home", icon: <Home size={17} />, href: "" },
     {

@@ -1,16 +1,16 @@
 import App from "./App.jsx";
-import { StrictMode } from "react";
 import { Provider } from "react-redux";
 import { createRoot } from "react-dom/client";
 import { UserProvider } from "./context/UserContext";
 import { store } from "./redux/store/stash.store.js";
+import { UserSnippetContextProvider } from "./context/UserSnippetsContext.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <UserProvider>
+  <UserProvider>
+    <UserSnippetContextProvider>
       <Provider store={store}>
         <App />
       </Provider>
-    </UserProvider>
-  </StrictMode>
+    </UserSnippetContextProvider>
+  </UserProvider>
 );

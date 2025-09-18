@@ -13,8 +13,10 @@ import {
   Settings,
   CircleUserRound,
 } from "lucide-react";
+import { useUserContext } from "../../hooks/useUserContext";
 
 function MobileDashboardSidebar({ closeSidebar }) {
+  const { user } = useUserContext();
   const { theme } = useTheme();
   const [openSettingToggle, setOpenSettingToggle] = useState(false);
   const textPrimary = "text-text-light-primary dark:text-text-dark-primary";
@@ -52,8 +54,8 @@ function MobileDashboardSidebar({ closeSidebar }) {
   return (
     <div className="w-full h-svh flex flex-col justify-between select-none border-r-[.5px] border-r-border-light dark:border-r-border-dark">
       {/* logo */}
-      <Link className="h-[5%]" to="">
-        <div className="flex items-center p-3 gap-3">
+      <Link className="h-[5%] " to="">
+        <div className="flex items-center p-3 gap-3 border-b-[0.5px] border-border-light dark:border-border-dark">
           <span>
             {theme == "dark" ? (
               <img className="md:w-6 w-5" src={logoDark} alt="stash-log" />
@@ -66,8 +68,16 @@ function MobileDashboardSidebar({ closeSidebar }) {
           </span>
         </div>
       </Link>
+      <div className="px-3 py-3 mt-3 w-full flex flex-col border-b-[0.5px] border-border-light dark:border-border-dark">
+        <div className="text-[0.86rem] text-text-light-secondary dark:text-text-dark-secondary font-medium whitespace-nowrap">
+          {user.username}
+        </div>
+        <div className="text-[0.86rem] relative bottom-0.5 text-text-light-secondary dark:text-text-dark-secondary whitespace-nowrap">
+          {user.email}
+        </div>
+      </div>
       {/* navigations */}
-      <div className="h-[87%] mt-6 text-[.95rem] pb-5 font-normal">
+      <div className="h-[87%] text-[.95rem] pb-5 font-normal">
         <ul className="flex flex-col gap-1 p-3 cursor-pointer pb-[2rem] border-b-[.5px] border-b-border-light dark:border-b-border-dark">
           {navLinks.map((list, id) => {
             return (
