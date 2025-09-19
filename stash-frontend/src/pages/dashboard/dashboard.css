@@ -1,0 +1,4 @@
+.masonry-grid-layout {
+  grid-template-rows: masonry;
+  object-fit: contain;
+}

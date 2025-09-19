@@ -46,7 +46,6 @@ const saveStash = asyncHandler(async (req, res) => {
       note,
       sourceUrl,
     });
-    io.emit("newStash", newStash); // 🔥 send to all connected clients
 
     // Send a success response back to the extension
     res
@@ -80,5 +79,22 @@ const getAllUserSnippets = asyncHandler(async (req, res) => {
   res.status(200).json(allUsersSavedData);
 });
 
-export { saveStash, getCategories, getAllUserSnippets };
+const deleteCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedItem = await Stash.findByIdAndDelete(id);
+    if (!deletedItem) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "Item deleted successfully", item: deletedItem });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error deleting item", error: err.message });
+  }
+});
+
+export { saveStash, getCategories, getAllUserSnippets, deleteCategory };
 // getAllUserSnippets;

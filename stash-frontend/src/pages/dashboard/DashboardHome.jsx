@@ -1,18 +1,44 @@
-import { useEffect, useState } from "react";
 import { useUserContext } from "../../hooks/useUserContext";
 import {
   SquareBottomDashedScissors,
   FileImage,
   LayoutDashboard,
+  Copy,
+  Check,
+  SquarePen,
+  Trash2,
+  Search,
+  Settings2,
 } from "lucide-react";
-import axios from "axios";
-import { serverUrl } from "../constents";
+import { FaSort } from "react-icons/fa";
 import { MdTextFields } from "react-icons/md";
 import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
+import "../../App.css";
+import "./dashboard.css";
+import { copyToClipboard } from "../../utils/functions/copyToClipboard";
+import { useEffect, useState } from "react";
+import { serverUrl } from "../constents";
+import axios from "axios";
 
 function DashboardHome() {
   const { user } = useUserContext();
-  const { snippets, setSnippets, stats, setStats } = useUserSnippetContext();
+  const { copy } = copyToClipboard();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [snippetToDelete, setSnippetToDelete] = useState(null);
+  const [copiedMap, setCopiedMap] = useState({});
+
+  const { snippets, stats, setSnippets, setStats, calculateStats } =
+    useUserSnippetContext();
+  console.log("value", isDeleteModalOpen);
+
+  const handleCopy = async (id, text) => {
+    await copy(text);
+    setCopiedMap((prev) => ({ ...prev, [id]: true }));
+    setTimeout(() => {
+      setCopiedMap((prev) => ({ ...prev, [id]: false }));
+    }, 2000);
+  };
+
   const getGreeting = () => {
     const now = new Date();
     const hour = now.getHours(); // 0 - 23
@@ -51,6 +77,26 @@ function DashboardHome() {
   const today = new Date();
   const options = { weekday: "long", day: "numeric", month: "long" };
   const date = today.toLocaleDateString("en-US", options);
+
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Not authenticated");
+      await axios.delete(`${serverUrl}stashes/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const updatedSnippets = snippets.filter((item) => item._id !== id);
+      setSnippets(updatedSnippets);
+
+      setStats(calculateStats(updatedSnippets));
+      setSnippets((prev) => prev.filter((item) => item._id !== id));
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete snippet");
+    }
+  };
+
   return (
     <div className="w-full text-text-light-primary py-5 px-3 md:p-15 dark:text-text-dark-primary">
       {/* greatings */}
@@ -90,31 +136,152 @@ function DashboardHome() {
       {/* user data */}
       <div className="w-full mt-6 md:mt-4 rounded-lg px-3 box-border bg-bg-light-primary dark:bg-bg-dark-primary flex border-1 border-border-light dark:border-border-dark">
         {/* shows user all data */}
-        <div className="w-full lg:w-[80%] p-3 min-sm:border-r-[0.5px] border-border-light dark:border-border-dark">
+        <div className="w-full lg:w-[80%] px-1 min-sm:border-r-[0.5px] border-border-light dark:border-border-dark">
           <div className="p-3 pb-2 border-b-1 border-border-light dark:border-border-dark">
-            <div className="w-full flex">
+            <div className="w-full flex justify-between items-center">
               {/* heading */}
-              <div className="w-1/2">heading</div>
+              <div className="w-1/2 font-semibold">Your Collection</div>
               {/* filters */}
-              <div className="w-1/2">
-                <span>category</span>
-                <span>website</span>
-                <span></span>
-                <span></span>
+              <div className="w-1/2 flex items-center justify-end gap-4">
+                {/* dearch box  */}
+                <div className="flex items-center relative">
+                  <input
+                    className="border-[0.5px] rounded-md border-border-light dark:border-border-dark px-2 py-1 pr-8"
+                    type="text"
+                    placeholder="Search"
+                  />
+                  <span className="absolute right-2">
+                    <Search className="w-4" />
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <Settings2 className="w-4" />
+                    filter
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FaSort className="w-4" />
+                    sort
+                  </span>
+                </div>
               </div>
             </div>
+          </div>
+          <div className="columns-1 sm:columns-2 md:columns-3 gap-4 p-2">
+            {snippets.map((s) => {
+              const isImage =
+                s.type === "image" ||
+                s.content.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+
+              return (
+                <div
+                  key={s._id}
+                  className="break-inside-avoid border-[0.5px] border-border-light dark:border-border-dark p-2 rounded-md mb-4 bg-bg-light-secondary/50 dark:bg-bg-dark-secondary"
+                >
+                  {/* title and category */}
+                  <div className=" mb-2 flex gap-0 flex-col">
+                    <div className="flex justify-between">
+                      {/* titel */}
+                      <span className="font-medium">{s.title}</span>
+                      {/* content controls */}
+                      <div className="flex gap-1.5 group">
+                        <span>
+                          <SquarePen className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary transition-all duration-100" />
+                        </span>
+                        <span
+                          className=""
+                          onClick={() => {
+                            setSnippetToDelete(s._id);
+                            setIsDeleteModalOpen(true);
+                          }}
+                        >
+                          <Trash2
+                            // onClick={() => handleDelete(s._id)}
+                            className="w-4 text-text-light-secondary dark:text-text-dark-secondary group-hover:text-error dark:group-hover:text-error transition-all duration-100"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                    <span className="font-normal text-text-light-secondary dark:text-text-dark-secondary">
+                      from category {s.category}
+                    </span>
+                  </div>
+
+                  {/* content */}
+                  <div className="w-fit">
+                    {isImage ? (
+                      <img
+                        src={s.content}
+                        alt={s.title || "snippet"}
+                        className="w-full max-w-[250px] rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
+                      />
+                    ) : (
+                      <div className="px-1.5 font-medium min-w-20 py-[2px] rounded-sm border-dashed border-2 border-border-light dark:border-border-dark">
+                        {s.content}
+                      </div>
+                    )}
+                  </div>
+                  <div
+                    className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
+                    onClick={() => handleCopy(s._id, s.content)}
+                  >
+                    {copiedMap[s._id] ? (
+                      <>
+                        <Check size={14} className="text-green-500" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* source link */}
+                  <div className="px-2 overflow-hidden">
+                    {s.sourceUrl && (
+                      <a
+                        href={s.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-[0.85rem] inline-block mt-2 text-blue-600 dark:text-blue-400 underline cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 break-words"
+                      >
+                        {new URL(s.sourceUrl).hostname +
+                          (new URL(s.sourceUrl).pathname.length > 20
+                            ? new URL(s.sourceUrl).pathname.slice(0, 20) + "..."
+                            : new URL(s.sourceUrl).pathname)}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
         {/* shows recent data */}
         <div className="hidden min-sm:flex flex-col box-border p-3 lg:w-[20%]">
           <span>Recently Added</span>
-          <div className="flex flex-col mt-1 rounded-lg text-text-light-secondary dark:text-text-dark-secondary">
+          <div className="flex max-h-[15rem] p-2 overflow-y-auto flex-col mt-1 rounded-lg text-text-light-secondary dark:text-text-dark-secondary">
             {snippets.map((s) => {
-              return <span>{s.title}</span>;
+              return (
+                <span
+                  className="border-b-[0.5px] border-border-light dark:border-border-dark"
+                  key={s._id}
+                >
+                  {s.title}
+                </span>
+              );
             })}
           </div>
         </div>
       </div>
+      <DeleteConfirmationModal
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        handleDelete={handleDelete}
+        snippetId={snippetToDelete}
+      />
     </div>
   );
 }
@@ -132,5 +299,52 @@ const UserSnippetInfoBox = ({ title, icon, count }) => {
         {count}
       </div>
     </div>
+  );
+};
+import { createPortal } from "react-dom";
+import Button from "../../utils/ui/Buttons/Button";
+
+const DeleteConfirmationModal = ({
+  isDeleteModalOpen,
+  setIsDeleteModalOpen,
+  handleDelete,
+  snippetId,
+}) => {
+  return createPortal(
+    isDeleteModalOpen && (
+      <div
+        onClick={() => setIsDeleteModalOpen(false)}
+        className="fixed inset-0 w-full h-svh backdrop-blur-[2px]"
+      >
+        <div className="flex items-center justify-center h-full ">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-80 box-border px-4 py-4 rounded-lg bg-bg-light-secondary dark:bg-bg-dark-secondary border-[0.5px] border-border-light dark:border-border-dark shadow-2xs"
+          >
+            <h1 className="mb-2 font-semibold text-text-light-primary dark:text-text-dark-primary text-[1.1rem]">
+              Delete Snippet?
+            </h1>
+            <span className="mt-1 text-[1rem] w-full text-text-light-secondary dark:text-text-dark-secondary leading-[0.8]">
+              This snippet will be permanently removed from your collection. Are
+              you sure you want to proceed?
+            </span>
+            <div className="w-full flex items-center mt-4">
+              <span
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="w-1/2 text-center cursor-pointer text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary hover:dark:text-text-dark-primary"
+              >
+                Cancel
+              </span>
+              <Button
+                onClick={() => handleDelete(snippetId)}
+                className="w-1/2! bg-error! hover:bg-error/90!"
+                text="Delete"
+              ></Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    document.getElementById("delete-confirmation-modal-portal")
   );
 };

@@ -14,6 +14,15 @@ export const UserSnippetContextProvider = ({ children }) => {
     uniqueCategories: 0,
   });
 
+  // Helper function to calculate stats from snippets array
+  const calculateStats = (snippetsArray) => {
+    const totalStashes = snippetsArray.length;
+    const totalImages = snippetsArray.filter((s) => s.type === "image").length;
+    const totalTexts = snippetsArray.filter((s) => s.type === "text").length;
+    const uniqueCategories = new Set(snippetsArray.map((s) => s.category)).size;
+    return { totalStashes, totalImages, totalTexts, uniqueCategories };
+  };
+
   // We combine all setup logic into a single useEffect hook
   useEffect(() => {
     // --- 1. Initial Data Fetch ---
@@ -28,50 +37,22 @@ export const UserSnippetContextProvider = ({ children }) => {
 
         const data = response.data;
         setSnippets(data);
+        console.log(data);
 
         // Calculate stats based on the initial fetch
-        const totalStashes = data.length;
-        const totalImages = data.filter((s) => s.type === "image").length;
-        const totalTexts = data.filter((s) => s.type === "text").length;
-        const uniqueCategories = new Set(data.map((s) => s.category)).size;
-        setStats({ totalStashes, totalImages, totalTexts, uniqueCategories });
+        setStats(calculateStats(data));
       } catch (error) {
         console.error("Error fetching initial data:", error);
       }
     };
 
     fetchInitialData();
-
-    // --- 2. Socket.IO Real-time Listener ---
-    const socket = io(serverUrl, { transports: ["websocket"] });
-
-    socket.on("newStash", (newStash) => {
-      console.log("New stash received via socket:", newStash);
-
-      // Update both snippets and stats when a new stash arrives
-      setSnippets((prevSnippets) => [newStash, ...prevSnippets]);
-
-      setStats((prevStats) => {
-        const allSnippets = [newStash, ...snippets];
-        const uniqueCategories = new Set(allSnippets.map((s) => s.category))
-          .size;
-
-        return {
-          totalStashes: prevStats.totalStashes + 1,
-          totalImages:
-            prevStats.totalImages + (newStash.type === "image" ? 1 : 0),
-          totalTexts: prevStats.totalTexts + (newStash.type === "text" ? 1 : 0),
-          uniqueCategories: uniqueCategories,
-        };
-      });
-    });
-
-    // --- 3. Cleanup ---
-    return () => socket.disconnect();
-  }, [snippets]);
+  }, []);
 
   return (
-    <UserSnippetContext.Provider value={{ snippets, stats }}>
+    <UserSnippetContext.Provider
+      value={{ snippets, stats, setSnippets, setStats, calculateStats }}
+    >
       {children}
     </UserSnippetContext.Provider>
   );
