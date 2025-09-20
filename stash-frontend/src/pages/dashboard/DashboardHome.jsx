@@ -19,6 +19,8 @@ import { copyToClipboard } from "../../utils/functions/copyToClipboard";
 import { useEffect, useRef, useState } from "react";
 import { serverUrl } from "../constents";
 import axios from "axios";
+import Input from "../../utils/ui/Input";
+import "react-loading-skeleton/dist/skeleton.css";
 
 function DashboardHome() {
   const { user } = useUserContext();
@@ -27,7 +29,7 @@ function DashboardHome() {
   const [snippetToDelete, setSnippetToDelete] = useState(null);
   const [copiedMap, setCopiedMap] = useState({});
 
-  const { snippets, stats, setSnippets, setStats, calculateStats } =
+  const { snippets, stats, setSnippets, setStats, calculateStats, loading } =
     useUserSnippetContext();
   console.log("value", isDeleteModalOpen);
 
@@ -78,24 +80,24 @@ function DashboardHome() {
   const options = { weekday: "long", day: "numeric", month: "long" };
   const date = today.toLocaleDateString("en-US", options);
 
-  const isCode = (text) => {
-    if (typeof text !== "string") return false;
+  // const isCode = (text) => {
+  //   if (typeof text !== "string") return false;
 
-    // 1. Check for multiple lines, which is common in code
-    const hasMultipleLines = text.includes("\n");
+  //   // 1. Check for multiple lines, which is common in code
+  //   const hasMultipleLines = text.includes("\n");
 
-    // 2. Check for common code characters
-    const hasCodeCharacters = /[{}()[\];=><]/.test(text);
+  //   // 2. Check for common code characters
+  //   const hasCodeCharacters = /[{}()[\];=><]/.test(text);
 
-    // 3. Check for common keywords
-    const hasCodeKeywords =
-      /\b(const|let|var|function|import|export|if|else|return|div|span|class)\b/.test(
-        text
-      );
+  //   // 3. Check for common keywords
+  //   const hasCodeKeywords =
+  //     /\b(const|let|var|function|import|export|if|else|return|div|span|class)\b/.test(
+  //       text
+  //     );
 
-    // If text has multiple lines AND (code characters OR keywords), it's likely code.
-    return hasMultipleLines && (hasCodeCharacters || hasCodeKeywords);
-  };
+  //   // If text has multiple lines AND (code characters OR keywords), it's likely code.
+  //   return hasMultipleLines && (hasCodeCharacters || hasCodeKeywords);
+  // };
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -112,6 +114,8 @@ function DashboardHome() {
     } catch (err) {
       console.error(err);
       alert("Failed to delete snippet");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,19 +159,25 @@ function DashboardHome() {
       <div className="w-full mt-6 md:mt-4 rounded-lg px-3 box-border bg-bg-light-primary dark:bg-bg-dark-primary flex border-1 border-border-light dark:border-border-dark">
         {/* shows user all data */}
         <div className="w-full lg:w-[80%] px-1 min-sm:border-r-[0.5px] border-border-light dark:border-border-dark">
-          <div className="p-3 pb-2 border-b-1 border-border-light dark:border-border-dark">
-            <div className="w-full flex justify-between items-center">
+          <div className="p-3 md:pb-2 pb-0 border-b-1 border-border-light dark:border-border-dark">
+            <div className="w-full flex justify-between md:justify-between gap-4 items-center">
               {/* heading */}
-              <div className="w-1/2 font-semibold">Your Collection</div>
-              {/* filters */}
-              <div className="w-1/2 flex items-center justify-end gap-4">
-                {/* search box  */}
-                {/* <button className="flex items-center justify-center gap-2 bg-bg-dark-primary/5 dark:bg-bg-light-primary/5 border-1 border-border-light dark:border-border-dark rounded-lg dark:text-text-dark-secondary text-text-light-secondary hover:dark:text-text-dark-primary hover:text-text-light-primary px-2 py-1.5 text-[.8rem]">
-                  <span>
-                    <Search size={15} />
-                  </span>
-                  <span className=""></span>
-                </button> */}
+              <div className="hidden md:block w-1/2 font-semibold">
+                Your Collection
+              </div>
+              {/* search box for mobile */}
+              <div className="flex sm:hidden relative">
+                <span className="absolute right-2 z-[50000000] top-5">
+                  <Search size={15} />
+                </span>
+                <Input
+                  placeholder="Search"
+                  type="text"
+                  className="pr-8"
+                ></Input>
+              </div>
+              {/* filters and search box  */}
+              <div className="md:w-1/2 flex items-center justify-end gap-4">
                 <div className=" hidden md:flex items-center relative">
                   <input
                     className="border-[0.5px] rounded-md border-border-light dark:border-border-dark px-2 py-1 pr-8"
@@ -181,17 +191,24 @@ function DashboardHome() {
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
                     <Settings2 className="w-4" />
-                    filter
+
+                    <span className="hidden md:flex">filter</span>
                   </span>
                   <span className="flex items-center gap-1">
                     <FaSort className="w-4" />
-                    sort
+                    <span className="hidden md:flex">sort</span>
                   </span>
                 </div>
               </div>
             </div>
           </div>
-          {snippets.length === 0 ? (
+
+          {loading ? (
+            <div className="">
+              {/* Loading... */}
+              <LoadingSkleton />
+            </div>
+          ) : snippets.length === 0 ? (
             <div className="p-8 text-center text-text-light-secondary dark:text-text-dark-secondary">
               Looks like it’s empty here… add a snippet to make this space
               yours.
@@ -214,7 +231,7 @@ function DashboardHome() {
                         {/* titel */}
                         <span className="font-medium">{s.title}</span>
                         {/* content controls */}
-                        <div className="flex gap-2.5 group">
+                        <div className="flex gap-2.5">
                           <span>
                             <SquarePen className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary transition-all duration-100" />
                           </span>
@@ -225,7 +242,7 @@ function DashboardHome() {
                               setIsDeleteModalOpen(true);
                             }}
                           >
-                            <Trash2 className="w-4 text-text-light-secondary dark:text-text-dark-secondary group-hover:text-error dark:group-hover:text-error transition-all duration-100" />
+                            <Trash2 className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-error dark:group-hover:text-error transition-all duration-100" />
                           </span>
                         </div>
                       </div>
@@ -240,32 +257,32 @@ function DashboardHome() {
                         <img
                           src={s.content}
                           alt={s.title || "snippet"}
-                          className="w-full max-w-[250px] rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
+                          className="w-full max-w-[305px] rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
                         />
                       ) : (
                         <div className="px-1.5 font-medium min-w-20 py-[2px] rounded-sm border-dashed border-2 border-border-light dark:border-border-dark">
-                          {/* <SnippetBox text={s.content} /> */}
-                          {/* <span>{s.content}</span> */}
                           <SyntexHighliter text={s.content} />
                         </div>
                       )}
                     </div>
-                    <div
-                      className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
-                      onClick={() => handleCopy(s._id, s.content)}
-                    >
-                      {copiedMap[s._id] ? (
-                        <>
-                          <Check size={14} className="text-green-500" />
-                          <span>Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={16} />
-                          <span>Copy</span>
-                        </>
-                      )}
-                    </div>
+                    {!isImage && (
+                      <div
+                        className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
+                        onClick={() => handleCopy(s._id, s.content)}
+                      >
+                        {copiedMap[s._id] ? (
+                          <>
+                            <Check size={14} className="text-green-500" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={16} />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </div>
+                    )}
 
                     {/* source link */}
                     <div className="px-2 overflow-hidden">
@@ -297,7 +314,7 @@ function DashboardHome() {
             {snippets.map((s) => {
               return (
                 <span
-                  className="border-b-[0.5px] border-border-light dark:border-border-dark"
+                  className="mb-1 border-b-[0.5px] border-border-light dark:border-border-dark"
                   key={s._id}
                 >
                   {s.title}
@@ -383,6 +400,7 @@ import hljs from "highlight.js";
 import lightTheme from "highlight.js/styles/github.css?inline";
 import darkTheme from "highlight.js/styles/github-dark.css?inline";
 import { useTheme } from "../../hooks/useTheme";
+import LoadingSkleton from "../../utils/ui/LoadingSkleton";
 
 const SyntexHighliter = ({ text }) => {
   const codeRef = useRef(null);

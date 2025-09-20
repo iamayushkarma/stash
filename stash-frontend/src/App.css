@@ -6,7 +6,6 @@ body {
   font-family: "Roboto", sans-serif;
   @apply bg-bg-dark-primary text-text-dark-primary;
 }
-
 :root {
   --autofill-bg: #e6f7ff;
   --autofill-text: #0c0e12;

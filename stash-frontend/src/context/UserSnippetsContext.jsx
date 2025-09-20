@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 export const UserSnippetContext = createContext();
 
 export const UserSnippetContextProvider = ({ children }) => {
+  const [loading, setLoading] = useState(false);
   const [snippets, setSnippets] = useState([]);
   const [stats, setStats] = useState({
     totalStashes: 0,
@@ -28,6 +29,7 @@ export const UserSnippetContextProvider = ({ children }) => {
     // --- 1. Initial Data Fetch ---
     const fetchInitialData = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("accessToken");
         if (!token) throw new Error("Not authenticated");
 
@@ -43,6 +45,8 @@ export const UserSnippetContextProvider = ({ children }) => {
         setStats(calculateStats(data));
       } catch (error) {
         console.error("Error fetching initial data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -51,7 +55,14 @@ export const UserSnippetContextProvider = ({ children }) => {
 
   return (
     <UserSnippetContext.Provider
-      value={{ snippets, stats, setSnippets, setStats, calculateStats }}
+      value={{
+        snippets,
+        stats,
+        setSnippets,
+        setStats,
+        calculateStats,
+        loading,
+      }}
     >
       {children}
     </UserSnippetContext.Provider>
