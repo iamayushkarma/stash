@@ -19,6 +19,14 @@ cloudinary.config({
 const saveStash = asyncHandler(async (req, res) => {
   try {
     const { title, category, type, content, note, sourceUrl } = req.body;
+
+    // const { content } = req.body;
+
+    console.log("Received content:", content);
+    console.log("Received length:", content.length);
+    console.log("Content type:", typeof content);
+
+    // Before saving to DB
     const userId = req.user.id;
 
     if (!content) {
@@ -36,7 +44,7 @@ const saveStash = asyncHandler(async (req, res) => {
       });
       finalContent = uploadResult.secure_url;
     }
-
+    console.log("About to save:", finalContent);
     const newStash = await Stash.create({
       user: userId,
       title,

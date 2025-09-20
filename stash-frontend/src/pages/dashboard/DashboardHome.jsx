@@ -16,7 +16,7 @@ import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
 import "../../App.css";
 import "./dashboard.css";
 import { copyToClipboard } from "../../utils/functions/copyToClipboard";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { serverUrl } from "../constents";
 import axios from "axios";
 
@@ -78,6 +78,24 @@ function DashboardHome() {
   const options = { weekday: "long", day: "numeric", month: "long" };
   const date = today.toLocaleDateString("en-US", options);
 
+  const isCode = (text) => {
+    if (typeof text !== "string") return false;
+
+    // 1. Check for multiple lines, which is common in code
+    const hasMultipleLines = text.includes("\n");
+
+    // 2. Check for common code characters
+    const hasCodeCharacters = /[{}()[\];=><]/.test(text);
+
+    // 3. Check for common keywords
+    const hasCodeKeywords =
+      /\b(const|let|var|function|import|export|if|else|return|div|span|class)\b/.test(
+        text
+      );
+
+    // If text has multiple lines AND (code characters OR keywords), it's likely code.
+    return hasMultipleLines && (hasCodeCharacters || hasCodeKeywords);
+  };
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -112,14 +130,14 @@ function DashboardHome() {
       <div className="py-3 md:w-[75%] lg:w-[39rem] md:py-6 cursor-default">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 lg:gap-2">
           <UserSnippetInfoBox
-            title="Categorys"
-            icon={<FileImage className="w-3.5" />}
-            count={stats?.uniqueCategories || 0}
-          />
-          <UserSnippetInfoBox
             title="Snippets"
             icon={<SquareBottomDashedScissors className="w-3.5" />}
             count={stats?.totalStashes || 0}
+          />
+          <UserSnippetInfoBox
+            title="Categorys"
+            icon={<FileImage className="w-3.5" />}
+            count={stats?.uniqueCategories || 0}
           />
           <UserSnippetInfoBox
             title="Images"
@@ -143,8 +161,14 @@ function DashboardHome() {
               <div className="w-1/2 font-semibold">Your Collection</div>
               {/* filters */}
               <div className="w-1/2 flex items-center justify-end gap-4">
-                {/* dearch box  */}
-                <div className="flex items-center relative">
+                {/* search box  */}
+                {/* <button className="flex items-center justify-center gap-2 bg-bg-dark-primary/5 dark:bg-bg-light-primary/5 border-1 border-border-light dark:border-border-dark rounded-lg dark:text-text-dark-secondary text-text-light-secondary hover:dark:text-text-dark-primary hover:text-text-light-primary px-2 py-1.5 text-[.8rem]">
+                  <span>
+                    <Search size={15} />
+                  </span>
+                  <span className=""></span>
+                </button> */}
+                <div className=" hidden md:flex items-center relative">
                   <input
                     className="border-[0.5px] rounded-md border-border-light dark:border-border-dark px-2 py-1 pr-8"
                     type="text"
@@ -167,97 +191,104 @@ function DashboardHome() {
               </div>
             </div>
           </div>
-          <div className="columns-1 sm:columns-2 md:columns-3 gap-4 p-2">
-            {snippets.map((s) => {
-              const isImage =
-                s.type === "image" ||
-                s.content.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+          {snippets.length === 0 ? (
+            <div className="p-8 text-center text-text-light-secondary dark:text-text-dark-secondary">
+              Looks like it’s empty here… add a snippet to make this space
+              yours.
+            </div>
+          ) : (
+            <div className="columns-1 sm:columns-2 md:columns-3 gap-4 p-2">
+              {snippets.map((s) => {
+                const isImage =
+                  s.type === "image" ||
+                  s.content.match(/\.(jpeg|jpg|gif|png|webp)$/i);
 
-              return (
-                <div
-                  key={s._id}
-                  className="break-inside-avoid border-[0.5px] border-border-light dark:border-border-dark p-2 rounded-md mb-4 bg-bg-light-secondary/50 dark:bg-bg-dark-secondary"
-                >
-                  {/* title and category */}
-                  <div className=" mb-2 flex gap-0 flex-col">
-                    <div className="flex justify-between">
-                      {/* titel */}
-                      <span className="font-medium">{s.title}</span>
-                      {/* content controls */}
-                      <div className="flex gap-1.5 group">
-                        <span>
-                          <SquarePen className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary transition-all duration-100" />
-                        </span>
-                        <span
-                          className=""
-                          onClick={() => {
-                            setSnippetToDelete(s._id);
-                            setIsDeleteModalOpen(true);
-                          }}
-                        >
-                          <Trash2
-                            // onClick={() => handleDelete(s._id)}
-                            className="w-4 text-text-light-secondary dark:text-text-dark-secondary group-hover:text-error dark:group-hover:text-error transition-all duration-100"
-                          />
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-normal text-text-light-secondary dark:text-text-dark-secondary">
-                      from category {s.category}
-                    </span>
-                  </div>
-
-                  {/* content */}
-                  <div className="w-fit">
-                    {isImage ? (
-                      <img
-                        src={s.content}
-                        alt={s.title || "snippet"}
-                        className="w-full max-w-[250px] rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
-                      />
-                    ) : (
-                      <div className="px-1.5 font-medium min-w-20 py-[2px] rounded-sm border-dashed border-2 border-border-light dark:border-border-dark">
-                        {s.content}
-                      </div>
-                    )}
-                  </div>
+                return (
                   <div
-                    className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
-                    onClick={() => handleCopy(s._id, s.content)}
+                    key={s._id}
+                    className="break-inside-avoid border-[0.5px] border-border-light dark:border-border-dark p-2 rounded-md mb-4 bg-bg-light-secondary/50 dark:bg-bg-dark-secondary"
                   >
-                    {copiedMap[s._id] ? (
-                      <>
-                        <Check size={14} className="text-green-500" />
-                        <span>Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={16} />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </div>
+                    {/* title and category */}
+                    <div className=" mb-2 flex gap-0 flex-col">
+                      <div className="flex justify-between">
+                        {/* titel */}
+                        <span className="font-medium">{s.title}</span>
+                        {/* content controls */}
+                        <div className="flex gap-2.5 group">
+                          <span>
+                            <SquarePen className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary transition-all duration-100" />
+                          </span>
+                          <span
+                            className=""
+                            onClick={() => {
+                              setSnippetToDelete(s._id);
+                              setIsDeleteModalOpen(true);
+                            }}
+                          >
+                            <Trash2 className="w-4 text-text-light-secondary dark:text-text-dark-secondary group-hover:text-error dark:group-hover:text-error transition-all duration-100" />
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-normal text-text-light-secondary dark:text-text-dark-secondary">
+                        from category {s.category}
+                      </span>
+                    </div>
 
-                  {/* source link */}
-                  <div className="px-2 overflow-hidden">
-                    {s.sourceUrl && (
-                      <a
-                        href={s.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-[0.85rem] inline-block mt-2 text-blue-600 dark:text-blue-400 underline cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 break-words"
-                      >
-                        {new URL(s.sourceUrl).hostname +
-                          (new URL(s.sourceUrl).pathname.length > 20
-                            ? new URL(s.sourceUrl).pathname.slice(0, 20) + "..."
-                            : new URL(s.sourceUrl).pathname)}
-                      </a>
-                    )}
+                    {/* content */}
+                    <div className="w-fit">
+                      {isImage ? (
+                        <img
+                          src={s.content}
+                          alt={s.title || "snippet"}
+                          className="w-full max-w-[250px] rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
+                        />
+                      ) : (
+                        <div className="px-1.5 font-medium min-w-20 py-[2px] rounded-sm border-dashed border-2 border-border-light dark:border-border-dark">
+                          {/* <SnippetBox text={s.content} /> */}
+                          {/* <span>{s.content}</span> */}
+                          <SyntexHighliter text={s.content} />
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
+                      onClick={() => handleCopy(s._id, s.content)}
+                    >
+                      {copiedMap[s._id] ? (
+                        <>
+                          <Check size={14} className="text-green-500" />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={16} />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* source link */}
+                    <div className="px-2 overflow-hidden">
+                      {s.sourceUrl && (
+                        <a
+                          href={s.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-[0.85rem] inline-block mt-2 text-blue-600 dark:text-blue-400 underline cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 break-words"
+                        >
+                          {new URL(s.sourceUrl).hostname +
+                            (new URL(s.sourceUrl).pathname.length > 20
+                              ? new URL(s.sourceUrl).pathname.slice(0, 20) +
+                                "..."
+                              : new URL(s.sourceUrl).pathname)}
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
         {/* shows recent data */}
         <div className="hidden min-sm:flex flex-col box-border p-3 lg:w-[20%]">
@@ -346,5 +377,69 @@ const DeleteConfirmationModal = ({
       </div>
     ),
     document.getElementById("delete-confirmation-modal-portal")
+  );
+};
+import hljs from "highlight.js";
+import lightTheme from "highlight.js/styles/github.css?inline";
+import darkTheme from "highlight.js/styles/github-dark.css?inline";
+import { useTheme } from "../../hooks/useTheme";
+
+const SyntexHighliter = ({ text }) => {
+  const codeRef = useRef(null);
+  const { theme } = useTheme();
+
+  const isCodeContent = () => {
+    const result = hljs.highlightAuto(text);
+    return result.language !== undefined && result.relevance > 5;
+  };
+
+  useEffect(() => {
+    if (!codeRef.current || !isCodeContent()) return;
+
+    hljs.highlightElement(codeRef.current);
+
+    const existing = document.getElementById("hljs-theme");
+    if (existing) existing.remove();
+
+    // Inject the current theme
+    const style = document.createElement("style");
+    style.id = "hljs-theme";
+    style.innerHTML = theme === "dark" ? darkTheme : lightTheme;
+    document.head.appendChild(style);
+  }, [text, theme]);
+  if (!isCodeContent()) {
+    return (
+      <span
+        className=""
+        style={{
+          whiteSpace: "pre-wrap",
+          wordBreak: "break-word",
+          fontFamily: "'Roboto', sans-serif",
+          fontWeight: 400,
+        }}
+      >
+        {text}
+      </span>
+    );
+  }
+  return (
+    <pre
+      ref={codeRef}
+      className={`hljs ${theme === "dark" ? "hljs-dark" : "hljs-light"}`}
+      style={{
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-word",
+        fontSize: "0.875rem",
+        lineHeight: "1.4",
+        padding: "8px",
+        borderRadius: "6px",
+        overflow: "auto",
+        background: "transparent",
+        fontFamily: "'Fira Code', 'Monaco', 'Cascadia Code', monospace",
+        margin: 0,
+      }}
+    >
+      <code>{text}</code>
+    </pre>
   );
 };

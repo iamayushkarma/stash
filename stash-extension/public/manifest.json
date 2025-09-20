@@ -16,7 +16,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["content.css"],
+      "resources": ["content.css", "getSelection.js"],
       "matches": ["<all_urls>"]
     }
   ],

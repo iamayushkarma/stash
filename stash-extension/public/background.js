@@ -43,45 +43,69 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // This onClicked listener is now updated with the new, more reliable logic.
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  // 1. Store the data in our temporary variable
+  // We only need to do this for the 'saveText' action
   if (info.menuItemId === "saveText") {
+    // 1. Execute our new script to get the text with proper formatting
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tab.id },
+        files: ["getSelection.js"],
+      },
+      (injectionResults) => {
+        if (
+          chrome.runtime.lastError ||
+          !injectionResults ||
+          !injectionResults[0]
+        ) {
+          console.error("Could not get selection.");
+          return;
+        }
+
+        // The result of the script is the formatted text
+        const formattedText = injectionResults[0].result;
+
+        // 2. Store the data and inject the UI as before
+        stashedData = {
+          dataType: "text",
+          data: formattedText,
+          sourceUrl: tab.url,
+        };
+        injectUI(); // Call your existing UI injection logic
+      }
+    );
+  }
+  // The image saving logic remains the same
+  else if (info.menuItemId === "saveImage") {
     stashedData = {
-      dataType: "text",
-      data: info.selectionText,
+      dataType: "image",
+      data: info.srcUrl,
       sourceUrl: tab.url,
     };
-  } else if (info.menuItemId === "saveImage") {
-    stashedData = { dataType: "image", data: info.srcUrl, sourceUrl: tab.url };
-  } // 2. Inject the UI (if it's not already there)
+    injectUI();
+  }
 
-  chrome.scripting.executeScript(
-    {
-      target: { tabId: tab.id },
-      func: () => !!document.getElementById("react-chrome-extension-root"),
-    },
-    (injectionResults) => {
-      if (
-        chrome.runtime.lastError ||
-        !injectionResults ||
-        !injectionResults[0]
-      ) {
-        return; // Fail silently if there's an issue
+  // A helper function to inject the UI if it's not already there
+  const injectUI = () => {
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tab.id },
+        func: () => !!document.getElementById("react-chrome-extension-root"),
+      },
+      (results) => {
+        if (chrome.runtime.lastError || !results || !results[0]) return;
+        if (!results[0].result) {
+          chrome.scripting.insertCSS({
+            target: { tabId: tab.id },
+            files: ["content.css"],
+          });
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ["content.js"],
+          });
+        } else {
+          chrome.tabs.sendMessage(tab.id, { type: "SHOW_EXISTING_MODAL" });
+        }
       }
-
-      if (!injectionResults[0].result) {
-        // If UI is not injected, inject the scripts. The React app will then ask for the data.
-        chrome.scripting.insertCSS({
-          target: { tabId: tab.id },
-          files: ["content.css"],
-        });
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ["content.js"],
-        });
-      } else {
-        // If UI is already there (just hidden), send a message to tell it to show itself and fetch new data.
-        chrome.tabs.sendMessage(tab.id, { type: "SHOW_EXISTING_MODAL" });
-      }
-    }
-  );
+    );
+  };
 });

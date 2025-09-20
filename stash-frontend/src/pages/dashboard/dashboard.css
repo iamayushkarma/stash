@@ -1,4 +1,11 @@
-.masonry-grid-layout {
-  grid-template-rows: masonry;
-  object-fit: contain;
+/* Light theme override */
+.hljs-light {
+  background: #f5f5f5; /* or transparent */
+  color: #333;
+}
+
+/* Dark theme override */
+.hljs-dark {
+  background: #1e1e1e; /* or transparent */
+  color: #f5f5f5;
 }
