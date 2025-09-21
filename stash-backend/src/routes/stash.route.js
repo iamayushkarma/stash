@@ -4,6 +4,7 @@ import {
   getCategories,
   getAllUserSnippets,
   deleteCategory,
+  editSnippet,
 } from "../controllers/stash.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -14,5 +15,6 @@ router.route("/").get(verifyJWT, getAllUserSnippets);
 router.route("/categories").get(verifyJWT, getCategories);
 
 router.route("/:id").delete(verifyJWT, deleteCategory);
+router.route("/:id").put(verifyJWT, editSnippet);
 
 export default router;

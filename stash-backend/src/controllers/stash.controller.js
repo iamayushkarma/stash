@@ -119,5 +119,31 @@ const deleteCategory = asyncHandler(async (req, res) => {
   }
 });
 
-export { saveStash, getCategories, getAllUserSnippets, deleteCategory };
+const editSnippet = asyncHandler(async (req, res) => {
+  const { title, category, content, note, sourceUrl } = req.body;
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  const updateSnippet = await Stash.findByIdAndUpdate(
+    { _id: id, user: userId },
+    { $set: { title, category, content, note, sourceUrl } },
+    { new: true, runValidators: true }
+  );
+  if (!updateSnippet) {
+    return res
+      .status(404)
+      .json({ message: "Stash not found or user not authorized" });
+  }
+  res
+    .status(200)
+    .json({ message: "Stash updated successfully!", data: updateSnippet });
+});
+
+export {
+  saveStash,
+  getCategories,
+  getAllUserSnippets,
+  deleteCategory,
+  editSnippet,
+};
 // getAllUserSnippets;

@@ -10,6 +10,7 @@ import {
   Search,
   ChevronUp,
   ChevronDown,
+  X,
 } from "lucide-react";
 import { MdTextFields } from "react-icons/md";
 import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
@@ -36,18 +37,65 @@ function DashboardHome() {
   const [copiedMap, setCopiedMap] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [isFetching, setIsFetching] = useState(true);
-
   const {
     snippets,
+    allSnippets,
     stats,
     setSnippets,
     setStats,
     calculateStats,
     loading,
-    unfilteredSnippets,
-    setUnfilteredSnippets,
+    showAllSnippets,
+    setShowAllSnippets,
   } = useUserSnippetContext();
   console.log("value", isDeleteModalOpen);
+
+  const [editingSnippetId, setEditingSnippetId] = useState(null); // Tracks which snippet is being edited
+  const [editFormData, setEditFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: snippets.title,
+    category: snippets.category,
+    content: snippets.content,
+    note: snippets.note || "",
+    sourceUrl: snippets.sourceUrl,
+  });
+  const handleEditClick = (snippet) => {
+    setEditingSnippetId(snippet._id);
+    setEditFormData({ ...snippet }); // Pre-fill form with snippet data
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSnippetId(null);
+    setEditFormData({});
+  };
+
+  const handleFormInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleUpdateSnippet = async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.put(
+        `${serverUrl}stashes/${id}`,
+        editFormData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the snippet in the global state
+      setSnippets((prev) =>
+        prev.map((snippet) =>
+          snippet._id === id ? response.data.data : snippet
+        )
+      );
+      handleCancelEdit(); // Exit editing mode
+    } catch (err) {
+      console.error("Failed to update snippet:", err);
+      alert("Error: Could not update the snippet.");
+    }
+  };
 
   const handleCopy = async (id, text) => {
     await copy(text);
@@ -115,7 +163,7 @@ function DashboardHome() {
         setSnippets(response.data);
         console.log("search result", response.data);
       } catch (error) {
-        console.error("Error fetching snippets:", err);
+        console.error("Error fetching snippets:", error);
       } finally {
         setIsFetching(false);
       }
@@ -226,8 +274,144 @@ function DashboardHome() {
                 const isImage =
                   s.type === "image" ||
                   s.content.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+                return editingSnippetId === s._id ? (
+                  <div
+                    key={s._id}
+                    className="break-inside-avoid border-[0.5px] border-border-light dark:border-border-dark p-2 rounded-md mb-4 bg-bg-light-secondary/50 dark:bg-bg-dark-secondary"
+                  >
+                    {/* title and category */}
+                    <div className=" mb-2 flex gap-0 flex-col">
+                      <div className="flex justify-between">
+                        {/* titel */}
+                        {/* <span className="font-medium">{s.title}</span> */}
+                        <input
+                          name="title"
+                          value={editFormData.title ?? ""}
+                          onChange={handleFormInputChange}
+                          className="w-full font-medium bg-transparent outline-none mb-1 pr-2"
+                        />
+                        {/* content controls */}
+                        <div className="flex gap-2.5">
+                          <span
+                            className=""
+                            onClick={() => {
+                              setSnippetToDelete(s._id);
+                              setIsDeleteModalOpen(true);
+                            }}
+                          >
+                            <Trash2 className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-error dark:group-hover:text-error transition-all duration-100" />
+                          </span>
+                        </div>
+                      </div>
+                      {/* <span className="font-normal text-text-light-secondary dark:text-text-dark-secondary">
+                          from category {s.category}
+                        </span> */}
+                      <input
+                        name="category"
+                        value={editFormData.category ?? ""}
+                        onChange={handleFormInputChange}
+                        className="w-full text-sm text-gray-500 bg-transparent outline-none mb-2"
+                      />
+                    </div>
 
-                return (
+                    {/* content */}
+                    <div className="">
+                      {s.type === "text" && (
+                        <textarea
+                          name="content"
+                          value={editFormData.content ?? ""}
+                          onChange={handleFormInputChange}
+                          rows={5}
+                          className="p-2 w-full max-w-[305px] max-h-[40rem] resize-none rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
+                        />
+                      )}
+                    </div>
+
+                    {/* {!isImage && (
+                        <div
+                          className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
+                          onClick={() => handleCopy(s._id, s.content)}
+                        >
+                          {copiedMap[s._id] ? (
+                            <>
+                              <Check size={14} className="text-green-500" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={16} />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </div>
+                      )} */}
+                    {s.note && (
+                      <div className="mt-3 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/30 dark:to-gray-700/30 border-l-4 border-[#0883fe] dark:border-[#0883fe] rounded-r-lg">
+                        <div className="flex items-start space-x-2">
+                          <svg
+                            className="w-4 h-4 text-[#0883fe] mt-0.5 flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {/* <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                              {s.note}
+                            </p> */}
+                          <textarea
+                            name="note"
+                            value={editFormData.note ?? ""}
+                            onChange={handleFormInputChange}
+                            placeholder="Add a note..."
+                            rows={3}
+                            className="w-full text-sm rounded outline-none max-h-[3rem] resize-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {/* source link */}
+                    {/* <div className="px-2 overflow-hidden">
+                        {s.sourceUrl && (
+                          <a
+                            href={s.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-[0.85rem] inline-block mt-2 text-blue-600 dark:text-blue-400 underline cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 break-words"
+                          >
+                            {new URL(s.sourceUrl).hostname +
+                              (new URL(s.sourceUrl).pathname.length > 20
+                                ? new URL(s.sourceUrl).pathname.slice(0, 20) +
+                                  "..."
+                                : new URL(s.sourceUrl).pathname)}
+                          </a>
+                        )}
+                      </div> */}
+                    <input
+                      name="sourceUrl"
+                      value={editFormData.sourceUrl ?? ""}
+                      onChange={handleFormInputChange}
+                      className="w-full text-xs text-blue-600 bg-transparent outline-none mb-3"
+                    />
+                    <div className="flex justify-end gap-3">
+                      <button onClick={handleCancelEdit}>
+                        <X
+                          size={18}
+                          className="text-gray-500 hover:text-red-500"
+                        />
+                      </button>
+                      <button onClick={() => handleUpdateSnippet(s._id)}>
+                        <Check
+                          size={18}
+                          className="text-gray-500 hover:text-green-500"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
                   <div
                     key={s._id}
                     className="break-inside-avoid border-[0.5px] border-border-light dark:border-border-dark p-2 rounded-md mb-4 bg-bg-light-secondary/50 dark:bg-bg-dark-secondary"
@@ -239,7 +423,7 @@ function DashboardHome() {
                         <span className="font-medium">{s.title}</span>
                         {/* content controls */}
                         <div className="flex gap-2.5">
-                          <span>
+                          <span onClick={() => handleEditClick(s)}>
                             <SquarePen className="w-4 text-text-light-secondary dark:text-text-dark-secondary hover:text-primary dark:hover:text-primary transition-all duration-100" />
                           </span>
                           <span
@@ -345,28 +529,30 @@ function DashboardHome() {
 
           {/* Items list */}
           <div className="max-h-[15rem] overflow-y-auto space-y-1 py-1">
-            {(unfilteredSnippets ? snippets : snippets.slice(0, 5)).map((s) => (
-              <div
-                key={s._id}
-                className="group flex items-start space-x-1 cursor-default"
-              >
-                <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary transition-colors leading-relaxed">
-                  {s.title}
-                </span>
-              </div>
-            ))}
+            {(showAllSnippets ? allSnippets : allSnippets.slice(0, 5)).map(
+              (s) => (
+                <div
+                  key={s._id}
+                  className="group flex items-start space-x-1 cursor-default"
+                >
+                  <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary transition-colors leading-relaxed">
+                    {s.title}
+                  </span>
+                </div>
+              )
+            )}
           </div>
 
           {/* Show more/less button */}
           <div className="mt-3 pt-2 border-t border-border-light/30 dark:border-border-dark/30">
             <button
-              onClick={() => setUnfilteredSnippets(!unfilteredSnippets)}
+              onClick={() => setShowAllSnippets(!showAllSnippets)}
               className="group flex items-center justify-center space-x-1 w-full py-1 text-xs font-medium transition-all duration-200 text-text-light-secondary dark:text-text-dark-secondary hover:text-gray-600 dark:hover:text-gray-300"
             >
               <span className="capitalize">
-                {unfilteredSnippets ? "Show less" : "Show more"}
+                {showAllSnippets ? "Show less" : "Show more"}
               </span>
-              {unfilteredSnippets ? (
+              {showAllSnippets ? (
                 <ChevronUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
               ) : (
                 <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
