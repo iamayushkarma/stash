@@ -1,5 +1,5 @@
-import { ToggleMode } from "../utils/ui/Buttons/ThemeToggleBtn";
 import { useUserContext } from "../hooks/useUserContext";
+import { ToggleMode } from "../utils/ui/Buttons/ThemeToggleBtn";
 
 function DashboardNavbar() {
   const { user } = useUserContext();

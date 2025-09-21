@@ -1,4 +1,3 @@
-import { useUserContext } from "../../hooks/useUserContext";
 import {
   SquareBottomDashedScissors,
   FileImage,
@@ -12,31 +11,30 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
-import { MdTextFields } from "react-icons/md";
-import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
 import "../../App.css";
 import "./dashboard.css";
-import { copyToClipboard } from "../../utils/functions/copyToClipboard";
-import { useEffect, useRef, useState } from "react";
-import { serverUrl } from "../constents";
 import axios from "axios";
-import "react-loading-skeleton/dist/skeleton.css";
+import { useMemo } from "react";
 import hljs from "highlight.js";
+import { createPortal } from "react-dom";
+import { serverUrl } from "../constents";
+import { MdTextFields } from "react-icons/md";
+import { useTheme } from "../../hooks/useTheme";
+import "react-loading-skeleton/dist/skeleton.css";
+import useDebounce from "../../hooks/useDebounce";
+import Button from "../../utils/ui/Buttons/Button";
+import { useEffect, useRef, useState } from "react";
+import LoadingSkleton from "../../utils/ui/LoadingSkleton";
+import { useUserContext } from "../../hooks/useUserContext";
 import lightTheme from "highlight.js/styles/github.css?inline";
 import darkTheme from "highlight.js/styles/github-dark.css?inline";
-import { useTheme } from "../../hooks/useTheme";
-import LoadingSkleton from "../../utils/ui/LoadingSkleton";
-import { useMemo } from "react";
-import useDebounce from "../../hooks/useDebounce";
+import { copyToClipboard } from "../../utils/functions/copyToClipboard";
+import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
 
 function DashboardHome() {
+  // custom hooks
   const { user } = useUserContext();
   const { copy } = copyToClipboard();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [snippetToDelete, setSnippetToDelete] = useState(null);
-  const [copiedMap, setCopiedMap] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isFetching, setIsFetching] = useState(true);
   const {
     snippets,
     allSnippets,
@@ -44,67 +42,21 @@ function DashboardHome() {
     setSnippets,
     setStats,
     calculateStats,
-    loading,
     showAllSnippets,
     setShowAllSnippets,
   } = useUserSnippetContext();
-  console.log("value", isDeleteModalOpen);
-
-  const [editingSnippetId, setEditingSnippetId] = useState(null); // Tracks which snippet is being edited
+  // state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [snippetToDelete, setSnippetToDelete] = useState(null);
+  const [copiedMap, setCopiedMap] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFetching, setIsFetching] = useState(true);
+  const [editingSnippetId, setEditingSnippetId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
-  const [formData, setFormData] = useState({
-    title: snippets.title,
-    category: snippets.category,
-    content: snippets.content,
-    note: snippets.note || "",
-    sourceUrl: snippets.sourceUrl,
-  });
-  const handleEditClick = (snippet) => {
-    setEditingSnippetId(snippet._id);
-    setEditFormData({ ...snippet }); // Pre-fill form with snippet data
-  };
 
-  const handleCancelEdit = () => {
-    setEditingSnippetId(null);
-    setEditFormData({});
-  };
+  //- functional code
 
-  const handleFormInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditFormData((prev) => ({ ...prev, [name]: value }));
-  };
-  const handleUpdateSnippet = async (id) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      const response = await axios.put(
-        `${serverUrl}stashes/${id}`,
-        editFormData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      // Update the snippet in the global state
-      setSnippets((prev) =>
-        prev.map((snippet) =>
-          snippet._id === id ? response.data.data : snippet
-        )
-      );
-      handleCancelEdit(); // Exit editing mode
-    } catch (err) {
-      console.error("Failed to update snippet:", err);
-      alert("Error: Could not update the snippet.");
-    }
-  };
-
-  const handleCopy = async (id, text) => {
-    await copy(text);
-    setCopiedMap((prev) => ({ ...prev, [id]: true }));
-    setTimeout(() => {
-      setCopiedMap((prev) => ({ ...prev, [id]: false }));
-    }, 2000);
-  };
-
+  // function for generating greatings
   const getGreeting = () => {
     const now = new Date();
     const hour = now.getHours(); // 0 - 23
@@ -144,6 +96,73 @@ function DashboardHome() {
   const options = { weekday: "long", day: "numeric", month: "long" };
   const date = today.toLocaleDateString("en-US", options);
 
+  // update snippet
+  const handleEditClick = (snippet) => {
+    setEditingSnippetId(snippet._id);
+    setEditFormData({ ...snippet });
+  };
+  const handleCancelEdit = () => {
+    setEditingSnippetId(null);
+    setEditFormData({});
+  };
+  const handleFormInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleUpdateSnippet = async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.put(
+        `${serverUrl}stashes/${id}`,
+        editFormData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setSnippets((prev) =>
+        prev.map((snippet) =>
+          snippet._id === id ? response.data.data : snippet
+        )
+      );
+      handleCancelEdit();
+    } catch (err) {
+      console.error("Failed to update snippet:", err);
+      alert("Error: Could not update the snippet.");
+    }
+  };
+
+  // deleting snippet
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Not authenticated");
+      await axios.delete(`${serverUrl}stashes/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const updatedSnippets = snippets.filter((item) => item._id !== id);
+      setSnippets(updatedSnippets);
+
+      setStats(calculateStats(updatedSnippets));
+      setSnippets((prev) => prev.filter((item) => item._id !== id));
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete snippet");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // copying text
+  const handleCopy = async (id, text) => {
+    await copy(text);
+    setCopiedMap((prev) => ({ ...prev, [id]: true }));
+    setTimeout(() => {
+      setCopiedMap((prev) => ({ ...prev, [id]: false }));
+    }, 2000);
+  };
+
   //   debounced search
   const debouncedSearchTerm = useDebounce(searchTerm, 350); // 500ms delay
   useEffect(() => {
@@ -170,26 +189,6 @@ function DashboardHome() {
     };
     fetchSnippets();
   }, [debouncedSearchTerm, setSnippets]);
-  const handleDelete = async (id) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Not authenticated");
-      await axios.delete(`${serverUrl}stashes/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const updatedSnippets = snippets.filter((item) => item._id !== id);
-      setSnippets(updatedSnippets);
-
-      setStats(calculateStats(updatedSnippets));
-      setSnippets((prev) => prev.filter((item) => item._id !== id));
-      setIsDeleteModalOpen(false);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete snippet");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="w-full text-text-light-primary py-5 px-3 md:p-15 dark:text-text-dark-primary">
@@ -303,9 +302,6 @@ function DashboardHome() {
                           </span>
                         </div>
                       </div>
-                      {/* <span className="font-normal text-text-light-secondary dark:text-text-dark-secondary">
-                          from category {s.category}
-                        </span> */}
                       <input
                         name="category"
                         value={editFormData.category ?? ""}
@@ -327,24 +323,6 @@ function DashboardHome() {
                       )}
                     </div>
 
-                    {/* {!isImage && (
-                        <div
-                          className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
-                          onClick={() => handleCopy(s._id, s.content)}
-                        >
-                          {copiedMap[s._id] ? (
-                            <>
-                              <Check size={14} className="text-green-500" />
-                              <span>Copied!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy size={16} />
-                              <span>Copy</span>
-                            </>
-                          )}
-                        </div>
-                      )} */}
                     {s.note && (
                       <div className="mt-3 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/30 dark:to-gray-700/30 border-l-4 border-[#0883fe] dark:border-[#0883fe] rounded-r-lg">
                         <div className="flex items-start space-x-2">
@@ -359,9 +337,6 @@ function DashboardHome() {
                               clipRule="evenodd"
                             />
                           </svg>
-                          {/* <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                              {s.note}
-                            </p> */}
                           <textarea
                             name="note"
                             value={editFormData.note ?? ""}
@@ -374,22 +349,6 @@ function DashboardHome() {
                       </div>
                     )}
                     {/* source link */}
-                    {/* <div className="px-2 overflow-hidden">
-                        {s.sourceUrl && (
-                          <a
-                            href={s.sourceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-medium text-[0.85rem] inline-block mt-2 text-blue-600 dark:text-blue-400 underline cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 break-words"
-                          >
-                            {new URL(s.sourceUrl).hostname +
-                              (new URL(s.sourceUrl).pathname.length > 20
-                                ? new URL(s.sourceUrl).pathname.slice(0, 20) +
-                                  "..."
-                                : new URL(s.sourceUrl).pathname)}
-                          </a>
-                        )}
-                      </div> */}
                     <input
                       name="sourceUrl"
                       value={editFormData.sourceUrl ?? ""}
@@ -588,10 +547,6 @@ const UserSnippetInfoBox = ({ title, icon, count }) => {
   );
 };
 
-// delete confirmation modal
-import { createPortal } from "react-dom";
-import Button from "../../utils/ui/Buttons/Button";
-
 const DeleteConfirmationModal = ({
   isDeleteModalOpen,
   setIsDeleteModalOpen,
@@ -638,7 +593,6 @@ const DeleteConfirmationModal = ({
 };
 
 // code highlight
-
 const SyntexHighliter = ({ text }) => {
   const codeRef = useRef(null);
   const { theme } = useTheme();

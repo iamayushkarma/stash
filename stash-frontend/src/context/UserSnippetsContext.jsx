@@ -1,15 +1,14 @@
-import { createContext, useState, useEffect } from "react";
-import { serverUrl } from "../pages/constents";
 import axios from "axios";
-import { io } from "socket.io-client";
+import { serverUrl } from "../pages/constents";
+import { createContext, useState, useEffect } from "react";
 
 export const UserSnippetContext = createContext();
 
 export const UserSnippetContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [snippets, setSnippets] = useState([]);
-  const [allSnippets, setAllSnippets] = useState([]); // <-- keep full list separately
-  const [showAllSnippets, setShowAllSnippets] = useState(false); // <-- boolean for toggle
+  const [allSnippets, setAllSnippets] = useState([]);
+  const [showAllSnippets, setShowAllSnippets] = useState(false);
 
   const [stats, setStats] = useState({
     totalStashes: 0,

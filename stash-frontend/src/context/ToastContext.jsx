@@ -1,5 +1,5 @@
-import { createContext, useContext, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { createContext, useContext, useRef, useEffect } from "react";
 
 const ToastContext = createContext();
 

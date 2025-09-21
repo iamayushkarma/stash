@@ -1,5 +1,5 @@
-import { UserSnippetContext } from "../context/UserSnippetsContext";
 import { useContext } from "react";
+import { UserSnippetContext } from "../context/UserSnippetsContext";
 
 export const useUserSnippetContext = () => {
   const context = useContext(UserSnippetContext);
