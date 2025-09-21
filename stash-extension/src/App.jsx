@@ -237,10 +237,9 @@ function App() {
       rootElement.style.display = "none";
     }
   };
-
   return (
     <>
-      <div className="w-full h-svh flex items-center justify-center">
+      <div className="w-screen h-screen flex items-center justify-center">
         <form
           ref={modalRef}
           tabIndex="-1"
@@ -330,7 +329,7 @@ function App() {
             }
             <textarea
               rows={4}
-              className="w-full placeholder:text-[.9rem] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200 pb-8 h-20 resize-none "
+              className="w-full placeholder:text-[.9em] px-4 py-2 bg-bg-light-secondary/30 active:outline-none focus:outline-bg-dark-primary/70 dark:focus:outline-bg-dark-primary/10 dark:bg-bg-dark-secondary/50 border border-border-light dark:border-border-dark/30 rounded-md text-gray-700 dark:text-gray-200 pb-8 h-20 resize-none "
               placeholder="Add a note (optional)"
               value={note}
               onChange={(e) => setNote(e.target.value)}

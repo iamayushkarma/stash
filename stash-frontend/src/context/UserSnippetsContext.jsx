@@ -8,6 +8,8 @@ export const UserSnippetContext = createContext();
 export const UserSnippetContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [snippets, setSnippets] = useState([]);
+  const [unfilteredSnippets, setUnfilteredSnippets] = useState([]);
+
   const [stats, setStats] = useState({
     totalStashes: 0,
     totalImages: 0,
@@ -39,6 +41,7 @@ export const UserSnippetContextProvider = ({ children }) => {
 
         const data = response.data;
         setSnippets(data);
+        setUnfilteredSnippets(data);
         console.log(data);
 
         // Calculate stats based on the initial fetch
@@ -62,6 +65,8 @@ export const UserSnippetContextProvider = ({ children }) => {
         setStats,
         calculateStats,
         loading,
+        unfilteredSnippets,
+        setUnfilteredSnippets,
       }}
     >
       {children}

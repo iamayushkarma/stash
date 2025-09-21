@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: "class",
-  content: ["./src/**/*.{js,ts,jsx,tsx}", , "./popup.html", "./index.html"],
+  important: true,
+  content: ["./src/**/*.{js,ts,jsx,tsx}", "./popup.html", "./index.html"],
   safelist: [
     "bg-bg-light-secondary",
     "dark:bg-bg-dark-secondary",
@@ -11,6 +12,9 @@ export default {
     "text-text-light-primary",
     // Add any other custom classes you need
   ],
+  corePlugins: {
+    preflight: false, // Disable Tailwind's CSS reset to avoid conflicts
+  },
   theme: {
     extend: {
       fontFamily: {

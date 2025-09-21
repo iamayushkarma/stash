@@ -80,11 +80,26 @@ const getCategories = asyncHandler(async (req, res) => {
 
 const getAllUserSnippets = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const allUsersSavedData = await Stash.find({ user: userId }).sort({
-    createdAt: -1,
-  });
-  // io.emit("newStash", allUsersSavedData);
-  res.status(200).json(allUsersSavedData);
+
+  // Get the search term from the URL query, if it exists
+  const { search } = req.query;
+
+  // Start with a base filter to only get the logged-in user's data
+  const filter = { user: userId };
+
+  // If a search term was provided, add the search logic to the filter
+  if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { content: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  // Use the final filter to query the database
+  const snippets = await Stash.find(filter).sort({ createdAt: -1 });
+
+  res.status(200).json(snippets);
 });
 
 const deleteCategory = asyncHandler(async (req, res) => {

@@ -8,9 +8,9 @@ import {
   SquarePen,
   Trash2,
   Search,
-  Settings2,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
-import { FaSort } from "react-icons/fa";
 import { MdTextFields } from "react-icons/md";
 import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
 import "../../App.css";
@@ -19,8 +19,14 @@ import { copyToClipboard } from "../../utils/functions/copyToClipboard";
 import { useEffect, useRef, useState } from "react";
 import { serverUrl } from "../constents";
 import axios from "axios";
-import Input from "../../utils/ui/Input";
 import "react-loading-skeleton/dist/skeleton.css";
+import hljs from "highlight.js";
+import lightTheme from "highlight.js/styles/github.css?inline";
+import darkTheme from "highlight.js/styles/github-dark.css?inline";
+import { useTheme } from "../../hooks/useTheme";
+import LoadingSkleton from "../../utils/ui/LoadingSkleton";
+import { useMemo } from "react";
+import useDebounce from "../../hooks/useDebounce";
 
 function DashboardHome() {
   const { user } = useUserContext();
@@ -28,9 +34,19 @@ function DashboardHome() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [snippetToDelete, setSnippetToDelete] = useState(null);
   const [copiedMap, setCopiedMap] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFetching, setIsFetching] = useState(true);
 
-  const { snippets, stats, setSnippets, setStats, calculateStats, loading } =
-    useUserSnippetContext();
+  const {
+    snippets,
+    stats,
+    setSnippets,
+    setStats,
+    calculateStats,
+    loading,
+    unfilteredSnippets,
+    setUnfilteredSnippets,
+  } = useUserSnippetContext();
   console.log("value", isDeleteModalOpen);
 
   const handleCopy = async (id, text) => {
@@ -80,24 +96,32 @@ function DashboardHome() {
   const options = { weekday: "long", day: "numeric", month: "long" };
   const date = today.toLocaleDateString("en-US", options);
 
-  // const isCode = (text) => {
-  //   if (typeof text !== "string") return false;
+  //   debounced search
+  const debouncedSearchTerm = useDebounce(searchTerm, 350); // 500ms delay
+  useEffect(() => {
+    const fetchSnippets = async () => {
+      setIsFetching(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
 
-  //   // 1. Check for multiple lines, which is common in code
-  //   const hasMultipleLines = text.includes("\n");
-
-  //   // 2. Check for common code characters
-  //   const hasCodeCharacters = /[{}()[\];=><]/.test(text);
-
-  //   // 3. Check for common keywords
-  //   const hasCodeKeywords =
-  //     /\b(const|let|var|function|import|export|if|else|return|div|span|class)\b/.test(
-  //       text
-  //     );
-
-  //   // If text has multiple lines AND (code characters OR keywords), it's likely code.
-  //   return hasMultipleLines && (hasCodeCharacters || hasCodeKeywords);
-  // };
+        let url = `${serverUrl}stashes`;
+        if (debouncedSearchTerm) {
+          url += `?search=${debouncedSearchTerm}`;
+        }
+        const response = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSnippets(response.data);
+        console.log("search result", response.data);
+      } catch (error) {
+        console.error("Error fetching snippets:", err);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+    fetchSnippets();
+  }, [debouncedSearchTerm, setSnippets]);
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -159,60 +183,43 @@ function DashboardHome() {
       <div className="w-full mt-6 md:mt-4 rounded-lg px-3 box-border bg-bg-light-primary dark:bg-bg-dark-primary flex border-1 border-border-light dark:border-border-dark">
         {/* shows user all data */}
         <div className="w-full lg:w-[80%] px-1 min-sm:border-r-[0.5px] border-border-light dark:border-border-dark">
-          <div className="p-3 md:pb-2 pb-0 border-b-1 border-border-light dark:border-border-dark">
+          <div className="py-2 md:p-3 pb-2 border-b-1 border-border-light dark:border-border-dark">
             <div className="w-full flex justify-between md:justify-between gap-4 items-center">
               {/* heading */}
-              <div className="hidden md:block w-1/2 font-semibold">
+              <div className="md:w-1/2 font-semibold text-[.9rem] md:text-[1rem]">
                 Your Collection
               </div>
-              {/* search box for mobile */}
-              <div className="flex sm:hidden relative">
-                <span className="absolute right-2 z-[50000000] top-5">
-                  <Search size={15} />
-                </span>
-                <Input
-                  placeholder="Search"
-                  type="text"
-                  className="pr-8"
-                ></Input>
-              </div>
-              {/* filters and search box  */}
-              <div className="md:w-1/2 flex items-center justify-end gap-4">
-                <div className=" hidden md:flex items-center relative">
+              <div className=" md:w-1/2 flex items-center justify-end gap-4">
+                <div className="flex items-center relative">
                   <input
-                    className="border-[0.5px] rounded-md border-border-light dark:border-border-dark px-2 py-1 pr-8"
+                    className="border-[0.5px] rounded-md border-border-light dark:border-border-dark px-2 py-1 md:pr-8"
                     type="text"
                     placeholder="Search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   <span className="absolute right-2">
                     <Search className="w-4" />
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1">
-                    <Settings2 className="w-4" />
-
-                    <span className="hidden md:flex">filter</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <FaSort className="w-4" />
-                    <span className="hidden md:flex">sort</span>
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {loading ? (
+          {isFetching ? (
             <div className="">
-              {/* Loading... */}
               <LoadingSkleton />
             </div>
           ) : snippets.length === 0 ? (
-            <div className="p-8 text-center text-text-light-secondary dark:text-text-dark-secondary">
-              Looks like it’s empty here… add a snippet to make this space
-              yours.
-            </div>
+            searchTerm ? (
+              <div className="p-8 text-center ...">
+                No results found for "{searchTerm}".
+              </div>
+            ) : (
+              <div className="p-8 text-center ...">
+                Looks like it’s empty here…
+              </div>
+            )
           ) : (
             <div className="columns-1 sm:columns-2 md:columns-3 gap-4 p-2">
               {snippets.map((s) => {
@@ -265,6 +272,7 @@ function DashboardHome() {
                         </div>
                       )}
                     </div>
+
                     {!isImage && (
                       <div
                         className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
@@ -283,7 +291,26 @@ function DashboardHome() {
                         )}
                       </div>
                     )}
-
+                    {s.note && (
+                      <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/30 dark:to-gray-700/30 border-l-4 border-[#0883fe] dark:border-[#0883fe] rounded-r-lg">
+                        <div className="flex items-start space-x-2">
+                          <svg
+                            className="w-4 h-4 text-[#0883fe] mt-0.5 flex-shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {s.note}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     {/* source link */}
                     <div className="px-2 overflow-hidden">
                       {s.sourceUrl && (
@@ -308,19 +335,43 @@ function DashboardHome() {
           )}
         </div>
         {/* shows recent data */}
-        <div className="hidden min-sm:flex flex-col box-border p-3 lg:w-[20%]">
-          <span>Recently Added</span>
-          <div className="flex max-h-[15rem] p-2 overflow-y-auto flex-col mt-1 rounded-lg text-text-light-secondary dark:text-text-dark-secondary">
-            {snippets.map((s) => {
-              return (
-                <span
-                  className="mb-1 border-b-[0.5px] border-border-light dark:border-border-dark"
-                  key={s._id}
-                >
+        <div className="hidden min-sm:flex flex-col box-border p-4 lg:w-[20%]">
+          {/* Header with subtle accent */}
+          <div className="flex items-center space-x-2 mb-3">
+            <h3 className="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">
+              Recently Added
+            </h3>
+          </div>
+
+          {/* Items list */}
+          <div className="max-h-[15rem] overflow-y-auto space-y-1 py-1">
+            {(unfilteredSnippets ? snippets : snippets.slice(0, 5)).map((s) => (
+              <div
+                key={s._id}
+                className="group flex items-start space-x-1 cursor-default"
+              >
+                <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary transition-colors leading-relaxed">
                   {s.title}
                 </span>
-              );
-            })}
+              </div>
+            ))}
+          </div>
+
+          {/* Show more/less button */}
+          <div className="mt-3 pt-2 border-t border-border-light/30 dark:border-border-dark/30">
+            <button
+              onClick={() => setUnfilteredSnippets(!unfilteredSnippets)}
+              className="group flex items-center justify-center space-x-1 w-full py-1 text-xs font-medium transition-all duration-200 text-text-light-secondary dark:text-text-dark-secondary hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <span className="capitalize">
+                {unfilteredSnippets ? "Show less" : "Show more"}
+              </span>
+              {unfilteredSnippets ? (
+                <ChevronUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -336,6 +387,7 @@ function DashboardHome() {
 
 export default DashboardHome;
 
+// user snippet info box
 const UserSnippetInfoBox = ({ title, icon, count }) => {
   return (
     <div className="flex w-full flex-col justify-center px-3 py-1 border-1 bg-bg-light-secondary dark:bg-bg-dark-secondary text-text-light-secondary dark:text-text-dark-secondary border-border-light dark:border-border-dark rounded-lg">
@@ -349,6 +401,8 @@ const UserSnippetInfoBox = ({ title, icon, count }) => {
     </div>
   );
 };
+
+// delete confirmation modal
 import { createPortal } from "react-dom";
 import Button from "../../utils/ui/Buttons/Button";
 
@@ -364,7 +418,7 @@ const DeleteConfirmationModal = ({
         onClick={() => setIsDeleteModalOpen(false)}
         className="fixed inset-0 w-full h-svh backdrop-blur-[2px]"
       >
-        <div className="flex items-center justify-center h-full ">
+        <div className="flex items-center justify-center h-full shadow-lg">
           <div
             onClick={(e) => e.stopPropagation()}
             className="w-80 box-border px-4 py-4 rounded-lg bg-bg-light-secondary dark:bg-bg-dark-secondary border-[0.5px] border-border-light dark:border-border-dark shadow-2xs"
@@ -396,23 +450,20 @@ const DeleteConfirmationModal = ({
     document.getElementById("delete-confirmation-modal-portal")
   );
 };
-import hljs from "highlight.js";
-import lightTheme from "highlight.js/styles/github.css?inline";
-import darkTheme from "highlight.js/styles/github-dark.css?inline";
-import { useTheme } from "../../hooks/useTheme";
-import LoadingSkleton from "../../utils/ui/LoadingSkleton";
+
+// code highlight
 
 const SyntexHighliter = ({ text }) => {
   const codeRef = useRef(null);
   const { theme } = useTheme();
 
-  const isCodeContent = () => {
+  const isCodeContent = useMemo(() => {
     const result = hljs.highlightAuto(text);
     return result.language !== undefined && result.relevance > 5;
-  };
+  }, [text]);
 
   useEffect(() => {
-    if (!codeRef.current || !isCodeContent()) return;
+    if (!codeRef.current || !isCodeContent) return;
 
     hljs.highlightElement(codeRef.current);
 
@@ -425,7 +476,7 @@ const SyntexHighliter = ({ text }) => {
     style.innerHTML = theme === "dark" ? darkTheme : lightTheme;
     document.head.appendChild(style);
   }, [text, theme]);
-  if (!isCodeContent()) {
+  if (!isCodeContent) {
     return (
       <span
         className=""

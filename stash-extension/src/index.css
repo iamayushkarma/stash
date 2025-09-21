@@ -2,8 +2,15 @@
 
 /* src/index.css */
 
+/* Force complete CSS reset in Shadow DOM */
+:host {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+}
+
+/* Rest of your CSS... */
+
 #react-chrome-extension-root {
-  /* 1. Make the container a full-screen overlay */
   position: fixed;
   top: 0;
   left: 0;
@@ -14,6 +21,7 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
+  font-size: 16px;
 }
 /*  tailwind darkMode */
 @custom-variant dark (&:where(.dark, .dark *));
