@@ -34,8 +34,8 @@ function Navbar() {
 
   const textPrimary = "text-text-light-primary dark:text-text-dark-primary";
   return (
-    <nav className=" w-full fixed  scroll-nome z-50 top-0 ">
-      <div className=" w-full relative border-b-[.5px] dark:border-b-border-dark border-b-border-light">
+    <nav className=" w-full fixed scroll-none z-50 top-0 ">
+      <div className=" w-full relative">
         <div className="w-full bg-bg-light-primary  dark:bg-bg-dark-primary flex p-3">
           <div className="w-full flex justify-between">
             {/* logo and navigation links */}

@@ -2,9 +2,17 @@
 /*  tailwind darkMode */
 @custom-variant dark (&:where(.dark, .dark *));
 
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+html,
 body {
   font-family: "Roboto", sans-serif;
-  @apply bg-bg-dark-primary text-text-dark-primary;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 :root {
   --autofill-bg: #e6f7ff;
@@ -24,25 +32,24 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: var(--autofill-text) !important;
 }
 
-/* Default (light mode) */
+/* Default (light mode) 
 ::-webkit-scrollbar {
   width: 4px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent; /* subtle light gray */
+  background: transparent; 
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3); /* dark gray thumb */
+  background-color: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
-/* Dark mode */
 @media (prefers-color-scheme: dark) {
   ::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.3);
@@ -52,7 +59,7 @@ input:-webkit-autofill:active {
     background-color: rgba(255, 255, 255, 0.5);
   }
 }
-
+*/
 @theme {
   /* brand color */
   --color-primary: #0883fe;
