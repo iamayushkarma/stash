@@ -11,18 +11,18 @@ function HeroSection() {
     <div className="w-full h-svh">
       <div className="w-full h-full flex items-center justify-center relative">
         {/* drawing images */}
-        <div className="absolute w-full h-[70%] justify-center flex flex-col z-0">
+        <div className="absolute w-full h-[85%] sm:h-[70%] justify-center flex flex-col z-0">
           <img
             src={theme === "light" ? ligthCloudDrawing : darkCloudDrawing}
             alt="CloudDrawing"
-            className="w-40 absolute top-10 left-10"
+            className="w-22 md:w-40 absolute top-10 left-10"
           />
 
           {/* bottom-right cloud */}
           <img
             src={theme === "light" ? ligthCloudDrawing : darkCloudDrawing}
             alt="CloudDrawing"
-            className="w-40 absolute bottom-10 right-10"
+            className="w-22 md:w-40 absolute bottom-10 right-10"
           />
         </div>
         {/* main content */}
@@ -37,7 +37,7 @@ function HeroSection() {
             {/* heading */}
             <div className="mt-8">
               <span>
-                <h1 className="text-[2rem] md:text-[3rem] lg:text-[4rem]">
+                <h1 className="font-medium text-[1.8rem] md:text-[3rem] lg:text-[4rem]">
                   Capture It. Save It.{" "}
                   <span className="relative inline-block">
                     Done
@@ -51,7 +51,7 @@ function HeroSection() {
               </span>
             </div>
             {/* sub-heading */}
-            <div className="mt-4 w-3/4 mx-auto text-text-light-secondary dark:text-text-dark-secondary font-medium">
+            <div className="mt-4 w-11/12 sm:w-3/4 mx-auto text-text-light-secondary dark:text-text-dark-secondary font-medium text-[0.9rem] sm:text-[1rem] ">
               <p>
                 Say goodbye to disorganized screenshots and scattered notes.
                 Effortlessly capture and organize both text and images into your
@@ -60,11 +60,11 @@ function HeroSection() {
             </div>
             {/* call to action buttons */}
             <div className="mt-8 flex items-center justify-center gap-3">
-              <button className="px-3 py-1.5 border-[0.5px] border-border-light dark:border-border-dark rounded-lg transition-all duration-200 hover:border-bg-dark-primary dark:hover:border-bg-light-primary active:scale-[0.995]">
+              <button className="px-3 py-1.5 border-[0.5px] border-border-light dark:border-border-dark rounded-lg transition-all duration-200 hover:border-bg-dark-primary dark:hover:border-bg-light-primary flex items-center active:scale-[0.995] text-[0.9rem] sm:text-[1rem]">
                 See How It Works
               </button>
               <Link to="/register">
-                <button className="px-3 py-1.5 border-[0.5px] border-border-light dark:border-border-dark rounded-lg bg-blue-500 hover:bg-primary text-white flex gap-1 group active:scale-[0.995]">
+                <button className="px-3 py-1.5 border-[0.5px] border-border-light dark:border-border-dark rounded-lg bg-blue-500 hover:bg-primary text-white flex items-center gap-1 group active:scale-[0.995] text-[0.9rem] sm:text-[1rem]">
                   Get Started for Free
                   <ChevronRight
                     className="w-4.5 transition-transform duration-200 group-hover:translate-x-0.5"
