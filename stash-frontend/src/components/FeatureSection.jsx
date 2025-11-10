@@ -7,19 +7,19 @@ function FeatureSection() {
   return (
     <div className="flex items-center justify-center bg-primary grid-bg">
       {/* feature section */}
-      <div className="flex w-full sm:w-11/12 md:w-3/4 items-center justify-center p-4 sm:mt-20">
+      <div className="flex w-full sm:w-11/12 md:w-3/4 items-center justify-center p-4 sm:mt-20 sm:mb-15">
         <div className="text-center flex flex-col items-center justify-center">
           {/* heading */}
-          <h1 className="w-2/3 text-2xl sm:text-3xl md:text-4xl font-medium text-text-dark-primary">
+          <h1 className="w-2/3 text-[1.3rem] sm:text-3xl md:text-4xl font-medium text-text-dark-primary">
             From Digital Clutter to a Clear Library.
           </h1>
           {/* sub heading */}
-          <p className="sm:w-3/4 mt-8 text-md sm:text-ld text-text-dark-primary/90">
+          <p className="sm:w-3/4 mt-5 sm:mt-8 text-[.9rem] sm:text-md sm:text-ld text-text-dark-primary/90">
             Turn your scattered finds into a structured, searchable library.
             Explore the powerful but simple features that make it possible.
           </p>
           {/* feature card */}
-          <div className="mt-16 min-sm:grid grid-cols-2 grid-rows-2">
+          <div className="mt-10 sm:mt-16 min-sm:grid grid-cols-2 grid-rows-2">
             <FeatureCard
               icon={
                 <BsClipboardPlus
@@ -71,7 +71,9 @@ function FeatureCard({ heading, subHeading, icon }) {
         <h2 className="font-medium mb-2 sm:mb-3 text-text-dark-primary">
           {heading}
         </h2>
-        <p className="text-text-dark-primary/90">{subHeading}</p>
+        <p className="text-[.89rem] sm:text-[1rem] text-text-dark-primary/90">
+          {subHeading}
+        </p>
       </div>
     </div>
   );

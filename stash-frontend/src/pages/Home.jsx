@@ -1,5 +1,6 @@
 import FeatureSection from "../components/FeatureSection";
 import HeroSection from "../components/HeroSection";
+import HowItWorks from "../components/HowItWorks";
 import UserDashboardImage from "../components/UserDashboardImage";
 
 function Home() {
@@ -8,6 +9,7 @@ function Home() {
       <HeroSection />
       <UserDashboardImage />
       <FeatureSection />
+      <HowItWorks />
     </div>
   );
 }
