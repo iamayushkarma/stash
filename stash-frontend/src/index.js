@@ -7,8 +7,8 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Register from "./pages/register/Register";
 import Snippets from "./pages/dashboard/Snippets.jsx";
 import Categories from "./pages/dashboard/Categories.jsx";
-import Screenshots from "./pages/dashboard/Screenshots.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
+import Image from "./pages/dashboard/Image.jsx";
 
 export {
   MainLayout,
@@ -18,7 +18,7 @@ export {
   PageNotFound,
   Dashboard,
   Snippets,
-  Screenshots,
+  Image,
   Categories,
   Help,
   DashboardHome,

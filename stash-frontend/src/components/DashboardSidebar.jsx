@@ -21,9 +21,9 @@ function DashboardSidebar() {
       href: "snippets",
     },
     {
-      label: "Screenshots",
+      label: "Images",
       icon: <FileImage size={17} />,
-      href: "screenshots",
+      href: "images",
     },
     {
       label: "Categories",

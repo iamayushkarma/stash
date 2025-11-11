@@ -102,6 +102,47 @@ const getAllUserSnippets = asyncHandler(async (req, res) => {
   res.status(200).json(snippets);
 });
 
+// get user text snippets info only
+const getTextSnippets = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const textSnippets = await Stash.find(
+    { user: userId, type: "text" },
+    {
+      _id: 1,
+      user: 1,
+      title: 1,
+      category: 1,
+      type: 1,
+      content: 1,
+      note: 1,
+      sourceUrl: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    }
+  ).sort({ createdAt: -1 });
+  res.status(200).json(textSnippets);
+});
+// get user image snippets info only
+const getImageSnippets = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const imageSnippets = await Stash.find(
+    { user: userId, type: "image" },
+    {
+      _id: 1,
+      user: 1,
+      title: 1,
+      category: 1,
+      type: 1,
+      content: 1,
+      note: 1,
+      sourceUrl: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    }
+  ).sort({ createdAt: -1 });
+  res.status(200).json(imageSnippets);
+});
+
 const deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
@@ -145,5 +186,7 @@ export {
   getAllUserSnippets,
   deleteCategory,
   editSnippet,
+  getTextSnippets,
+  getImageSnippets,
 };
 // getAllUserSnippets;

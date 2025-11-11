@@ -6,7 +6,7 @@ import {
   PageNotFound,
   Dashboard,
   Snippets,
-  Screenshots,
+  Image,
   Categories,
   Help,
   DashboardHome,
@@ -29,7 +29,7 @@ function App() {
             <Route path="/user/dashboard" element={<Dashboard />}>
               <Route index element={<DashboardHome />} />
               <Route path="snippets" element={<Snippets />} />
-              <Route path="screenshots" element={<Screenshots />} />
+              <Route path="images" element={<Image />} />
               <Route path="categories" element={<Categories />} />
               <Route path="help" element={<Help />} />
             </Route>

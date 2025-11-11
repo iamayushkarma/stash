@@ -2,9 +2,9 @@ import axios from "axios";
 import { serverUrl } from "../pages/constents";
 import { createContext, useState, useEffect } from "react";
 
-export const UserSnippetContext = createContext();
+export const UserTextSnippetContext = createContext();
 
-export const UserSnippetContextProvider = ({ children }) => {
+export const UserTextSnippetContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [snippets, setSnippets] = useState([]);
   const [allSnippets, setAllSnippets] = useState([]);
@@ -12,7 +12,6 @@ export const UserSnippetContextProvider = ({ children }) => {
 
   const [stats, setStats] = useState({
     totalStashes: 0,
-    totalImages: 0,
     totalTexts: 0,
     uniqueCategories: 0,
   });
@@ -20,10 +19,9 @@ export const UserSnippetContextProvider = ({ children }) => {
   // Helper function to calculate stats from snippets array
   const calculateStats = (snippetsArray) => {
     const totalStashes = snippetsArray.length;
-    const totalImages = snippetsArray.filter((s) => s.type === "image").length;
     const totalTexts = snippetsArray.filter((s) => s.type === "text").length;
     const uniqueCategories = new Set(snippetsArray.map((s) => s.category)).size;
-    return { totalStashes, totalImages, totalTexts, uniqueCategories };
+    return { totalStashes, totalTexts, uniqueCategories };
   };
 
   // We combine all setup logic into a single useEffect hook
@@ -35,14 +33,14 @@ export const UserSnippetContextProvider = ({ children }) => {
         const token = localStorage.getItem("accessToken");
         if (!token) throw new Error("Not authenticated");
 
-        const response = await axios.get(`${serverUrl}stashes`, {
+        const response = await axios.get(`${serverUrl}stashes/textSnippets`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const data = response.data;
         setSnippets(data);
         setAllSnippets(data);
-        console.log("User data", data);
+        console.log("Text data", data);
 
         // Calculate stats based on the initial fetch
         setStats(calculateStats(data));
@@ -57,7 +55,7 @@ export const UserSnippetContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserSnippetContext.Provider
+    <UserTextSnippetContext.Provider
       value={{
         snippets,
         allSnippets,
@@ -71,6 +69,6 @@ export const UserSnippetContextProvider = ({ children }) => {
       }}
     >
       {children}
-    </UserSnippetContext.Provider>
+    </UserTextSnippetContext.Provider>
   );
 };

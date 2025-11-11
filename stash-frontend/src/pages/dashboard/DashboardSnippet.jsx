@@ -29,8 +29,7 @@ import { useUserContext } from "../../hooks/useUserContext";
 import lightTheme from "highlight.js/styles/github.css?inline";
 import darkTheme from "highlight.js/styles/github-dark.css?inline";
 import { copyToClipboard } from "../../utils/functions/copyToClipboard";
-// import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
-import { useUserTextSnippetContext } from "../../hooks/useUserTextSnippetsContent";
+import { useUserSnippetContext } from "../../hooks/useUserSnippetContext";
 
 function DashboardHome() {
   // custom hooks
@@ -45,7 +44,7 @@ function DashboardHome() {
     calculateStats,
     showAllSnippets,
     setShowAllSnippets,
-  } = useUserTextSnippetContext();
+  } = useUserSnippetContext();
   // state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [snippetToDelete, setSnippetToDelete] = useState(null);
@@ -173,7 +172,7 @@ function DashboardHome() {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
 
-        let url = `${serverUrl}stashes/textSnippets`;
+        let url = `${serverUrl}stashes`;
         if (debouncedSearchTerm) {
           url += `?search=${debouncedSearchTerm}`;
         }
@@ -214,6 +213,11 @@ function DashboardHome() {
             title="Categorys"
             icon={<FileImage className="w-3.5" />}
             count={stats?.uniqueCategories || 0}
+          />
+          <UserSnippetInfoBox
+            title="Images"
+            icon={<LayoutDashboard className="w-3.5" />}
+            count={stats?.totalImages || 0}
           />
           <UserSnippetInfoBox
             title="Text"
@@ -266,6 +270,9 @@ function DashboardHome() {
           ) : (
             <div className="columns-1 sm:columns-2 md:columns-3 gap-4 p-2">
               {snippets.map((s) => {
+                const isImage =
+                  s.type === "image" ||
+                  s.content.match(/\.(jpeg|jpg|gif|png|webp)$/i);
                 return editingSnippetId === s._id ? (
                   <div
                     key={s._id}
@@ -396,12 +403,20 @@ function DashboardHome() {
 
                     {/* content */}
                     <div className="w-fit">
-                      <div className="px-1.5 font-medium min-w-20 py-[2px] rounded-sm border-dashed border-2 border-border-light dark:border-border-dark">
-                        <SyntexHighliter text={s.content} />
-                      </div>
+                      {isImage ? (
+                        <img
+                          src={s.content}
+                          alt={s.title || "snippet"}
+                          className="w-full max-w-[305px] rounded-md border-dashed border-2 border-border-light dark:border-border-dark object-cover"
+                        />
+                      ) : (
+                        <div className="px-1.5 font-medium min-w-20 py-[2px] rounded-sm border-dashed border-2 border-border-light dark:border-border-dark">
+                          <SyntexHighliter text={s.content} />
+                        </div>
+                      )}
                     </div>
 
-                    {
+                    {!isImage && (
                       <div
                         className="px-2 w-fit pt-2 flex text-[.9rem] items-center text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary gap-1.5 cursor-pointer"
                         onClick={() => handleCopy(s._id, s.content)}
@@ -418,7 +433,7 @@ function DashboardHome() {
                           </>
                         )}
                       </div>
-                    }
+                    )}
                     {s.note && (
                       <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800/30 dark:to-gray-700/30 border-l-4 border-[#0883fe] dark:border-[#0883fe] rounded-r-lg">
                         <div className="flex items-start space-x-2">
