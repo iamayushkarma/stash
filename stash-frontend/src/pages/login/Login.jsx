@@ -52,7 +52,7 @@ function Login() {
         refreshToken,
       });
       reset();
-      navigate("/user/dashboard");
+      navigate("/user/dashboard", { replace: true });
     } catch (error) {
       console.error(error.response?.data || error.message);
       setMessage(error.response?.data.message || error.message);

@@ -555,35 +555,30 @@ const DeleteConfirmationModal = ({
 }) => {
   return createPortal(
     isDeleteModalOpen && (
-      <div
-        onClick={() => setIsDeleteModalOpen(false)}
-        className="fixed inset-0 w-full h-svh backdrop-blur-[2px]"
-      >
-        <div className="flex items-center justify-center h-full shadow-lg">
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="w-80 box-border px-4 py-4 rounded-lg bg-bg-light-secondary dark:bg-bg-dark-secondary border-[0.5px] border-border-light dark:border-border-dark shadow-2xs"
-          >
-            <h1 className="mb-2 font-semibold text-text-light-primary dark:text-text-dark-primary text-[1.1rem]">
-              Delete Snippet?
-            </h1>
-            <span className="mt-1 text-[1rem] w-full text-text-light-secondary dark:text-text-dark-secondary leading-[0.8]">
-              This snippet will be permanently removed from your collection. Are
-              you sure you want to proceed?
+      <div className="fixed inset-0 flex items-center justify-center backdrop-blur-[2px] z-[99999]">
+        <div
+          onClick={() => setIsDeleteModalOpen(false)}
+          className="w-80 box-border px-4 py-5 rounded-lg bg-bg-light-secondary dark:bg-bg-dark-secondary border-[0.5px] border-border-light dark:border-border-dark shadow-lg"
+        >
+          <h1 className="mb-2 font-semibold text-text-light-primary dark:text-text-dark-primary text-[1.1rem]">
+            Delete Snippet?
+          </h1>
+          <p className="text-text-light-secondary dark:text-text-dark-secondary text-[0.95rem] mb-4">
+            This snippet will be permanently removed from your collection. Are
+            you sure you want to proceed?
+          </p>
+          <div className="w-full flex items-center mt-4">
+            <span
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="w-1/2 text-center cursor-pointer text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary hover:dark:text-text-dark-primary"
+            >
+              Cancel
             </span>
-            <div className="w-full flex items-center mt-4">
-              <span
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="w-1/2 text-center cursor-pointer text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary hover:dark:text-text-dark-primary"
-              >
-                Cancel
-              </span>
-              <Button
-                onClick={() => handleDelete(snippetId)}
-                className="w-1/2! bg-error! hover:bg-error/90!"
-                text="Delete"
-              ></Button>
-            </div>
+            <Button
+              onClick={() => handleDelete(snippetId)}
+              className="w-1/2! bg-error! hover:bg-error/90!"
+              text="Delete"
+            ></Button>
           </div>
         </div>
       </div>
