@@ -5,7 +5,7 @@ import { useTheme } from "../hooks/useTheme";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
-function HeroSection() {
+function HeroSection({ onScrollToSection }) {
   const { theme } = useTheme();
   return (
     <div className="w-full h-svh">
@@ -60,7 +60,10 @@ function HeroSection() {
             </div>
             {/* call to action buttons */}
             <div className="mt-8 flex items-center justify-center gap-3">
-              <button className="px-3 py-1.5 border-[0.5px] border-border-light dark:border-border-dark rounded-lg transition-all duration-200 hover:border-bg-dark-primary dark:hover:border-bg-light-primary flex items-center active:scale-[0.995] text-[0.9rem] sm:text-[1rem]">
+              <button
+                onClick={onScrollToSection}
+                className="px-3 py-1.5 border-[0.5px] border-border-light dark:border-border-dark rounded-lg transition-all duration-200 hover:border-bg-dark-primary dark:hover:border-bg-light-primary flex items-center active:scale-[0.995] text-[0.9rem] sm:text-[1rem]"
+              >
                 See How It Works
               </button>
               <Link to="/register">

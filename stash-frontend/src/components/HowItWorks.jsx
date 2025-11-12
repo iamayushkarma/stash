@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import React from "react";
 import "./components.css";
+import { useState, useEffect, useRef } from "react";
 import InstallIcon from "../assets/icons/cloud-computing.png";
 import InstallExtension from "../assets/images/InstallExtension.png";
 import SignIn from "../assets/icons/sign-in.png";
@@ -11,7 +12,7 @@ import DashboardDay from "../assets/images/DashboardDay.png";
 import DashboardDark from "../assets/images/DashboardDark.png";
 import { useTheme } from "../hooks/useTheme";
 
-function HowItWorks() {
+const HowItWorks = React.forwardRef((props, ref) => {
   const [active, setActive] = useState(0);
   const { theme } = useTheme();
   const scrollContainerRef = useRef(null);
@@ -67,7 +68,10 @@ function HowItWorks() {
   }, []);
 
   return (
-    <div className="mb-30 sm:mb-40 bg-bg-light-primary dark:bg-bg-dark-primary">
+    <div
+      ref={ref}
+      className="mb-30 sm:mb-40 bg-bg-light-primary dark:bg-bg-dark-primary"
+    >
       {/* heading */}
       <div className="p-3 mt-15 md:mt-30 text-center sm:mb-22">
         <div className="font-medium text-xl md:text-2xl lg:text-3xl text-text-light-primary dark:text-text-dark-primary">
@@ -144,7 +148,7 @@ function HowItWorks() {
       </div>
     </div>
   );
-}
+});
 
 export default HowItWorks;
 
