@@ -28,7 +28,6 @@ function Navbar() {
     { label: "Home", icon: <Home size={17} />, href: "/" },
     { label: "Docs", icon: <BookOpenText size={17} />, href: "/docs" },
     { label: "About", icon: <Info size={17} />, href: "/about" },
-    { label: "Features", icon: <Star size={17} />, href: "/features" },
     { label: "Contact", icon: <ContactRound size={17} />, href: "/contact" },
   ];
 

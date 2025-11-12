@@ -115,6 +115,19 @@ function Login() {
               <p className={errorClass}>{errors.password.message}</p>
             )}
             {message && <div className={errorClass}>{message}</div>}
+
+            <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary mt-2">
+              By signing in or creating an account, you agree to our{" "}
+              <a href="/terms" className="text-accent hover:underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="/privacy" className="text-accent hover:underline">
+                Privacy Policy
+              </a>
+              .
+            </p>
+
             {/* submit button */}
 
             <div>
