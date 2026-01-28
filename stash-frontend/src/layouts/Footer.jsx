@@ -20,8 +20,8 @@ function Footer() {
     { label: "Contact", href: "/contact" },
   ];
   const infoLinks = [
-    { label: "Privacy Policy", href: "/privacy-policy" },
-    { label: "Terms of Use", href: "/terms-of-use" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Use", href: "/terms" },
   ];
   return (
     <div className="w-full bg-bg-light-secondary flex flex-col justify-center items-center dark:bg-bg-dark-secondary border-t-[.5px] dark:border-t-border-dark border-t-border-light">
