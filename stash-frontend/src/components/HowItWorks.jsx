@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import "./components.css";
-import { useState, useEffect, useRef } from "react";
 import InstallIcon from "../assets/icons/cloud-computing.png";
 import InstallExtension from "../assets/images/InstallExtension.png";
 import SignIn from "../assets/icons/sign-in.png";
@@ -12,26 +12,64 @@ import DashboardDay from "../assets/images/DashboardDay.png";
 import DashboardDark from "../assets/images/DashboardDark.png";
 import { useTheme } from "../hooks/useTheme";
 
+const sectionReveal = {
+  hidden: { opacity: 0, y: 32 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: "easeOut" },
+  },
+};
+
 const HowItWorks = React.forwardRef((props, ref) => {
   const [active, setActive] = useState(0);
   const { theme } = useTheme();
   const scrollContainerRef = useRef(null);
 
-  const installationSteps = [
-    { label: "Install Extension", target: "content-box-1" },
-    { label: "Sign In", target: "content-box-2" },
-    { label: "Save Content", target: "content-box-3" },
-    { label: "Access Library", target: "content-box-4" },
+  const steps = [
+    {
+      id: "content-box-1",
+      label: "Install Extension",
+      icon: InstallIcon,
+      image: InstallExtension,
+      heading: "Add Clipo to Your Browser",
+      subheading:
+        "Add the extension to your browser to enable instant saving while browsing.",
+    },
+    {
+      id: "content-box-2",
+      label: "Sign In",
+      icon: SignIn,
+      image: Register,
+      heading: "Secure Your Personal Workspace",
+      subheading: "Sign in once to sync your saves across devices.",
+    },
+    {
+      id: "content-box-3",
+      label: "Save Content",
+      icon: Save,
+      image: SaveContent,
+      heading: "Capture Anything in One Click",
+      subheading: "Right-click text, images, or links → Save to Clipo → done.",
+    },
+    {
+      id: "content-box-4",
+      label: "Access Library",
+      icon: Access,
+      image: theme === "dark" ? DashboardDark : DashboardDay,
+      heading: "Search and Use Anytime",
+      subheading: "Open your dashboard and access your saved content anywhere.",
+    },
   ];
 
   const handleScroll = (id, index) => {
     const container = scrollContainerRef.current;
-    const targetSection = document.getElementById(id);
+    const target = document.getElementById(id);
 
-    if (container && targetSection) {
+    if (container && target) {
       setActive(index);
       container.scrollTo({
-        top: targetSection.offsetTop,
+        top: target.offsetTop,
         behavior: "smooth",
       });
     }
@@ -45,53 +83,52 @@ const HowItWorks = React.forwardRef((props, ref) => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const visibleId = entry.target.id;
-            const index = installationSteps.findIndex(
-              (step) => step.target === visibleId
+            const index = steps.findIndex(
+              (step) => step.id === entry.target.id
             );
             if (index !== -1) setActive(index);
           }
         });
       },
-      {
-        root: container,
-        threshold: 0.4, // triggers when 40% of section is visible
-      }
+      { root: container, threshold: 0.4 }
     );
 
-    installationSteps.forEach((step) => {
-      const section = document.getElementById(step.target);
-      if (section) observer.observe(section);
+    steps.forEach((step) => {
+      const el = document.getElementById(step.id);
+      if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
   }, []);
 
   return (
-    <div
+    <motion.section
       ref={ref}
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-120px" }}
       className="mb-30 sm:mb-40 bg-bg-light-primary dark:bg-bg-dark-primary"
     >
-      {/* heading */}
+      {/* Heading */}
       <div className="p-3 mt-15 md:mt-30 text-center sm:mb-22">
-        <div className="font-medium text-xl md:text-2xl lg:text-3xl text-text-light-primary dark:text-text-dark-primary">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-text-light-primary dark:text-text-dark-primary mb-3 sm:mb-4 px-4">
           How It Works
-        </div>
-        <p className="text-text-light-secondary dark:text-text-dark-secondary mt-4 md:mt-2.5 md:text-md text-[.9rem]">
-          Save what matters, give it context, and access it across your
-          workspace—without changing how you browse.
+        </h2>
+        <p className="text-base sm:text-lg text-text-light-secondary dark:text-text-dark-secondary max-w-2xl mx-auto px-4">
+          Save what matters, give it context, and access it anywhere.
         </p>
       </div>
 
-      {/* main */}
+      {/* Main */}
       <div className="mt-5 sm:mt-12 flex relative">
         {/* Sidebar */}
-        <div className="w-[20%] hidden p-2 sm:flex justify-center sticky top-0 border-r-[.5px] border-r-border-light dark:border-r-border-dark">
+        <div className="w-[20%] hidden sm:flex justify-center sticky top-0 border-r border-border-light dark:border-border-dark">
           <ul>
-            {installationSteps.map((step, index) => (
+            {steps.map((step, index) => (
               <li
-                key={index}
-                onClick={() => handleScroll(step.target, index)}
+                key={step.id}
+                onClick={() => handleScroll(step.id, index)}
                 className={`py-3 flex items-center gap-2 cursor-pointer transition-all ${
                   active === index
                     ? "font-semibold text-text-light-primary dark:text-white"
@@ -99,11 +136,10 @@ const HowItWorks = React.forwardRef((props, ref) => {
                 }`}
               >
                 <span
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  className={`w-1.5 h-1.5 rounded-full ${
                     active === index ? "bg-black dark:bg-white" : "bg-gray-400"
                   }`}
-                ></span>
-
+                />
                 <span className="text-sm">{step.label}</span>
               </li>
             ))}
@@ -113,62 +149,39 @@ const HowItWorks = React.forwardRef((props, ref) => {
         {/* Scroll container */}
         <div
           ref={scrollContainerRef}
-          id="howitworks-scroll-container"
-          className="w-full sm:w-[80%] h-[500px] sm:overflow-y-scroll sm:scroll-smooth scrollbar-hide p-8 flex flex-col gap-15 sm:gap-30"
+          className="w-full sm:w-[80%] h-[500px] sm:overflow-y-scroll scrollbar-hide p-8 flex flex-col gap-15 sm:gap-30"
         >
-          <StepInfoContent
-            id="content-box-1"
-            icon={InstallIcon}
-            image={InstallExtension}
-            heading="Add Clipo to Your Browser"
-            subheading="Add the extension to your browser to enable instant saving while browsing."
-          />
-          <StepInfoContent
-            id="content-box-2"
-            icon={SignIn}
-            image={Register}
-            heading="Secure Your Personal Workspace"
-            subheading="Sign in once to sync your saves. Your content now stays connected across desktop and laptop."
-          />
-          <StepInfoContent
-            id="content-box-3"
-            icon={Save}
-            image={SaveContent}
-            heading="Capture Anything in One Click"
-            subheading="Right-click images, text, or links → select Save to Clipo → add a title and category → done."
-          />
-          <StepInfoContent
-            id="content-box-4"
-            icon={Access}
-            image={theme === "dark" ? DashboardDark : DashboardDay}
-            heading="Search and Use Anytime"
-            subheading="Open your dashboard to browse your organized library from anywhere, on any device."
-          />
+          {steps.map((step) => (
+            <div key={step.id} id={step.id} className="w-full sm:w-[80%]">
+              <div className="flex gap-3 items-center">
+                <img
+                  src={step.icon}
+                  className="w-9 h-9 sm:w-12 sm:h-12"
+                  alt=""
+                />
+                <div>
+                  <h3 className="font-medium text-md sm:text-lg mb-1">
+                    {step.heading}
+                  </h3>
+                  <p className="text-sm sm:text-md text-text-light-secondary dark:text-text-dark-secondary">
+                    {step.subheading}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-12 hidden sm:block">
+                <img
+                  src={step.image}
+                  alt={step.heading}
+                  className="rounded-lg shadow-md"
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </motion.section>
   );
 });
 
 export default HowItWorks;
-
-function StepInfoContent({ id, icon, image, heading, subheading }) {
-  return (
-    <div id={id} className="w-full sm:w-[80%]">
-      <div className="flex gap-3 items-center">
-        <img src={icon} alt="step icon" className="w-9 h-9 sm:w-12 sm:h-12" />
-        <div>
-          <h2 className="font-medium text-md sm:text-lg mb-1 sm:mb-3">
-            {heading}
-          </h2>
-          <span className="mt-3 text-sm sm:text-md text-text-light-secondary dark:text-text-dark-secondary">
-            {subheading}
-          </span>
-        </div>
-      </div>
-      <div className="mt-12 hidden sm:block">
-        <img src={image} alt={heading} className="shadow-md rounded-lg" />
-      </div>
-    </div>
-  );
-}

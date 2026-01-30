@@ -2,18 +2,59 @@
 /*  tailwind darkMode */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Firefox - Force dark mode scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f5f6f8;
+}
+
+html.dark {
+  scrollbar-color: #585858 #010409 !important;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) - Force dark mode */
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #f5f6f8;
+}
+
+html.dark::-webkit-scrollbar-track {
+  background: #010409 !important;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+html.dark::-webkit-scrollbar-thumb {
+  background: #585858 !important;
+  border-radius: 4px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: #0883fe !important;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;
 }
+
 html,
 body {
   font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
+
 :root {
   --autofill-bg: #e6f7ff;
   --autofill-text: #0c0e12;
@@ -32,59 +73,24 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: var(--autofill-text) !important;
 }
 
-/* Default (light mode) 
-::-webkit-scrollbar {
-  width: 4px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent; 
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-}
-*/
 @theme {
   /* brand color */
   --color-primary: #0883fe;
-
   /* background color */
   --color-bg-light-primary: #ffffff;
   --color-bg-dark-primary: #010409;
-
   --color-bg-light-secondary: #f5f6f8;
   --color-bg-dark-secondary: #0f1114;
-
   /* text color */
   --color-text-light-primary: #030712;
   --color-text-dark-primary: #ffffff;
-
   --color-text-light-secondary: #364153;
   --color-text-dark-secondary: #d1d5dc;
-
   /* border color */
   --color-border-light: #d1d5db;
   --color-border-dark: #585858;
-
   /* Feedback Colors */
   --color-error: #ff2c2c;
-
   /* accent color */
   --color-bg-accent-dark: #caf0f8;
   --color-bg-accent-light: #cae9ff;

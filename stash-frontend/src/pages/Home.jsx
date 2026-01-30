@@ -4,6 +4,9 @@ import HowItWorks from "../components/HowItWorks";
 import UserDashboardImage from "../components/UserDashboardImage";
 import { useRef } from "react";
 import "./pages.css";
+import UseCasesSection from "../components/UseCasesSection";
+import SearchOrganizationSection from "../components/SearchOrganizationSection";
+import DecisionClosureSection from "../components/DecisionClosureSection";
 
 function Home() {
   const howItWorksRef = useRef(null);
@@ -16,7 +19,7 @@ function Home() {
       });
       setTimeout(() => {
         window.scrollBy({ top: -62, left: 0, behavior: "instant" });
-      }, 800); // increase if still not enough
+      }, 800);
     }
   };
 
@@ -26,6 +29,9 @@ function Home() {
       <UserDashboardImage />
       <FeatureSection />
       <HowItWorks ref={howItWorksRef} />
+      <UseCasesSection />
+      <SearchOrganizationSection />
+      <DecisionClosureSection />
     </div>
   );
 }
