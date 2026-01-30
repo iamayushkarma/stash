@@ -41,7 +41,7 @@ function LoginWithGoogleBtn() {
         refreshToken,
       });
 
-      // Navigate immediately after updating context
+      // Navigate immediately - this is the sole source of redirect
       navigate("/user/dashboard", { replace: true });
     } catch (error) {
       console.error("Error with Google login:", error);

@@ -17,7 +17,6 @@ router.route("/").get(verifyJWT, getAllUserSnippets);
 router.route("/categories").get(verifyJWT, getCategories);
 router.route("/textSnippets").get(verifyJWT, getTextSnippets);
 router.route("/imageSnippets").get(verifyJWT, getImageSnippets);
-
 router.route("/:id").delete(verifyJWT, deleteCategory);
 router.route("/:id").put(verifyJWT, editSnippet);
 

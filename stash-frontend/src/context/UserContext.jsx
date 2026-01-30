@@ -11,74 +11,44 @@ export const UserProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let isInitialLoad = true;
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    // Set isLoading to false after initial check
+    setIsLoading(false);
 
-    // Set up listener for auth state changes
+    // Set up listener for auth state changes - only for logout detection
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       console.log(
         "🔥 onAuthStateChanged fired, firebaseUser:",
         firebaseUser?.email
       );
 
-      if (!firebaseUser) {
-        console.log("❌ No Firebase user, setting isLoading to false");
-        setIsLoading(false);
+      // If no Firebase user and we're not on initial load, user logged out
+      if (!firebaseUser && !isInitialLoad) {
+        console.log("❌ Firebase user signed out, clearing app user");
+        setUser(null);
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         return;
       }
 
-      // If we already have a user in localStorage, skip exchange
-      const stored = localStorage.getItem("user");
-      if (stored) {
-        console.log(
-          "✅ User already in localStorage, skipping backend exchange"
-        );
-        setUser(JSON.parse(stored));
-        setIsLoading(false);
-        return;
+      // Don't do backend exchange here - the button component handles it
+      // Just update context if we have a stored user
+      if (firebaseUser) {
+        const stored = localStorage.getItem("user");
+        if (stored && JSON.parse(stored)._id) {
+          console.log(
+            "✅ User in localStorage, context already updated by button"
+          );
+          // Context was already updated by button's login() call
+        }
       }
 
-      console.log(
-        "🔄 No stored user, exchanging Firebase user with backend..."
-      );
-
-      // Exchange Firebase user with backend to get app tokens
-      const userData = {
-        name: firebaseUser.displayName,
-        email: firebaseUser.email,
-        googleId: firebaseUser.uid,
-      };
-
-      try {
-        console.log("📤 POSTing to /auth/google-login:", userData);
-        const apiResponse = await axios.post(
-          `${serverUrl}auth/google-login`,
-          userData,
-          { withCredentials: true }
-        );
-        const resData = apiResponse.data.data;
-        const { user: userFromBackend, accessToken, refreshToken } = resData;
-
-        console.log(
-          "✅ Backend exchange successful, user:",
-          userFromBackend._id
-        );
-        const combined = { ...userFromBackend, accessToken, refreshToken };
-        setUser(combined);
-        localStorage.setItem("user", JSON.stringify(combined));
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        console.log("💾 User saved to localStorage and context");
-      } catch (err) {
-        console.error(
-          "❌ Backend exchange failed:",
-          err.response?.data || err.message
-        );
-      } finally {
-        setIsLoading(false);
-      }
+      isInitialLoad = false;
     });
 
     return () => unsubscribe();

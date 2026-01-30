@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import UserAccount from "./pages/dashboard/UserAccount.jsx";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
               <Route path="images" element={<Image />} />
               <Route path="categories" element={<Categories />} />
               <Route path="help" element={<Help />} />
+              <Route path="account" element={<UserAccount />} />
             </Route>
             {/* Handle unknown routes */}
             <Route path="*" element={<PageNotFound />} />

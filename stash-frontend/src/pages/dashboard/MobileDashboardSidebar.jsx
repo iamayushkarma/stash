@@ -117,10 +117,13 @@ function MobileDashboardSidebar({ closeSidebar }) {
           <div
             className={`absolute ${openSettingToggle ? "" : "hidden"} space-y-1 px-2 py-1.5 flex-col rounded-lg w-28 bg-bg-dark-secondary/5 dark:bg-bg-light-secondary/5 border-1 border-border-light dark:border-border-dark bottom-7.5 transition-all duration-150`}
           >
-            <span className="px-1 flex items-center gap-1">
+            <Link
+              to="account"
+              className="px-1 flex items-center gap-1 hover:text-text-light-primary hover:dark:text-text-dark-primary transition-colors"
+            >
               <CircleUserRound size={15} />
               Account
-            </span>
+            </Link>
             <span className="px-1 md:ml-5 text-error">
               <LogoutBtn />
             </span>
