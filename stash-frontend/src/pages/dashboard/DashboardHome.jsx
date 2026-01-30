@@ -502,22 +502,24 @@ function DashboardHome() {
             )}
           </div>
 
-          {/* Show more/less button */}
-          <div className="mt-3 pt-2 border-t border-border-light/30 dark:border-border-dark/30">
-            <button
-              onClick={() => setShowAllSnippets(!showAllSnippets)}
-              className="group flex items-center justify-center space-x-1 w-full py-1 text-xs font-medium transition-all duration-200 text-text-light-secondary dark:text-text-dark-secondary hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              <span className="capitalize">
-                {showAllSnippets ? "Show less" : "Show more"}
-              </span>
-              {showAllSnippets ? (
-                <ChevronUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
-              )}
-            </button>
-          </div>
+          {/* Show more/less button - only visible if more than 5 items */}
+          {allSnippets.length > 5 && (
+            <div className="mt-3 pt-2 border-t border-border-light/30 dark:border-border-dark/30">
+              <button
+                onClick={() => setShowAllSnippets(!showAllSnippets)}
+                className="group flex items-center justify-center space-x-1 w-full py-1 text-xs font-medium transition-all duration-200 text-text-light-secondary dark:text-text-dark-secondary hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <span className="capitalize">
+                  {showAllSnippets ? "Show less" : "Show more"}
+                </span>
+                {showAllSnippets ? (
+                  <ChevronUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <DeleteConfirmationModal

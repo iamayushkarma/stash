@@ -10,19 +10,6 @@ dotenv.config({
   path: "./.env",
 });
 
-// cors configurations
-// app.use(
-//   cors({
-//     // origin: process.env.CORS_ORIGIN?.split(",") || "http://localhost:5173",
-//     origin: "*",
-//     credentials: true,
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//     allowedHeaders: ["Content-type", "Authorization"],
-//   })
-// );
-
-// In your main backend server file (e.g., app.js or server.js)
-
 // 1. Define a "whitelist" of trusted origins from your environment file
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(",")
@@ -38,11 +25,6 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
-
-    // For the Chrome extension, the origin will be the site the user is on (e.g., https://github.com)
-    // Since our API is protected by JWT authentication, we can decide to allow these requests.
-    // For now, let's allow them to get things working.
-    // A more advanced check could be added here later if needed.
     return callback(null, true);
   },
   credentials: true,
