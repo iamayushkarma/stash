@@ -14,6 +14,7 @@ import {
 import "./App.css";
 import { ThemeProvider } from "./context/ThemeContext";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Docs from "./pages/Docs.jsx";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
@@ -36,7 +37,14 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
             </Route>
-            <Route path="/user/dashboard" element={<Dashboard />}>
+            <Route
+              path="/user/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<DashboardHome />} />
               <Route path="snippets" element={<Snippets />} />
               <Route path="images" element={<Image />} />
