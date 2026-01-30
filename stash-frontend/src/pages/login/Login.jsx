@@ -25,10 +25,14 @@ function Login() {
     window.scrollTo(0, 0);
   }, []);
 
-  // If user is already authenticated (e.g., returned from Google redirect), navigate to dashboard
+  // Only redirect if user exists AND isLoading is false AND user wasn't just set (to avoid race conditions)
   useEffect(() => {
-    if (!isLoading && user) {
-      navigate("/user/dashboard", { replace: true });
+    if (user && !isLoading) {
+      // Small delay to ensure context is fully updated before navigating
+      const timer = setTimeout(() => {
+        navigate("/user/dashboard", { replace: true });
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [user, isLoading, navigate]);
 

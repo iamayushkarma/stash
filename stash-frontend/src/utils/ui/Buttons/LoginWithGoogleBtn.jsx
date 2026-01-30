@@ -1,33 +1,20 @@
 import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import { signInWithPopup, signInWithRedirect } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../Firebase";
 import { serverUrl } from "../../../pages/constents";
 import { useUserContext } from "../../../hooks/useUserContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function LoginWithGoogleBtn() {
   const { login } = useUserContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if on mobile device
-  const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
-  };
-
-  // Redirect result is handled centrally in UserContext via onAuthStateChanged
-  useEffect(() => {
-    // noop - keep to preserve lifecycle if needed in future
-  }, []);
-
   // Common function to handle Google authentication
   const handleGoogleAuth = async (response) => {
     try {
-      setIsLoading(true);
       const user = response.user;
 
       const userData = {
@@ -54,7 +41,8 @@ function LoginWithGoogleBtn() {
         refreshToken,
       });
 
-      navigate("/user/dashboard");
+      // Navigate immediately after updating context
+      navigate("/user/dashboard", { replace: true });
     } catch (error) {
       console.error("Error with Google login:", error);
       alert("Login failed. Please try again.");
@@ -63,24 +51,22 @@ function LoginWithGoogleBtn() {
     }
   };
 
-  // Login function that chooses popup or redirect based on device
+  // Login function - use popup for all devices (modern mobile browsers support it)
   const loginWithGoogle = async () => {
     try {
       setIsLoading(true);
-
-      if (isMobile()) {
-        // Use redirect for mobile devices
-        await signInWithRedirect(auth, provider);
-        // The redirect will happen, and the result will be handled in useEffect
-      } else {
-        // Use popup for desktop
-        const response = await signInWithPopup(auth, provider);
-        await handleGoogleAuth(response);
-      }
+      console.log("🚀 Starting Google login with popup...");
+      const response = await signInWithPopup(auth, provider);
+      console.log("✅ Popup succeeded, user:", response.user.email);
+      await handleGoogleAuth(response);
     } catch (error) {
-      console.error("Error initiating Google login:", error);
-      alert("Login failed. Please try again.");
+      console.error("❌ Google login failed:", error.message);
       setIsLoading(false);
+
+      // Only show error if user didn't cancel
+      if (error.code !== "auth/popup-closed-by-user") {
+        alert("Login failed. Please try again.");
+      }
     }
   };
 

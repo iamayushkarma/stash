@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import LoadingSkeleton from "../utils/ui/LoadingSkleton";
 
 const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useContext(UserContext);
@@ -8,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        Loading...
+        <LoadingSkeleton />
       </div>
     );
   }

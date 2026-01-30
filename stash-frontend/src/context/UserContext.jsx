@@ -15,9 +15,16 @@ export const UserProvider = ({ children }) => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    // Use onAuthStateChanged to detect Firebase auth state (handles redirect and popup)
+
+    // Set up listener for auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log(
+        "🔥 onAuthStateChanged fired, firebaseUser:",
+        firebaseUser?.email
+      );
+
       if (!firebaseUser) {
+        console.log("❌ No Firebase user, setting isLoading to false");
         setIsLoading(false);
         return;
       }
@@ -25,9 +32,17 @@ export const UserProvider = ({ children }) => {
       // If we already have a user in localStorage, skip exchange
       const stored = localStorage.getItem("user");
       if (stored) {
+        console.log(
+          "✅ User already in localStorage, skipping backend exchange"
+        );
+        setUser(JSON.parse(stored));
         setIsLoading(false);
         return;
       }
+
+      console.log(
+        "🔄 No stored user, exchanging Firebase user with backend..."
+      );
 
       // Exchange Firebase user with backend to get app tokens
       const userData = {
@@ -37,6 +52,7 @@ export const UserProvider = ({ children }) => {
       };
 
       try {
+        console.log("📤 POSTing to /auth/google-login:", userData);
         const apiResponse = await axios.post(
           `${serverUrl}auth/google-login`,
           userData,
@@ -45,13 +61,21 @@ export const UserProvider = ({ children }) => {
         const resData = apiResponse.data.data;
         const { user: userFromBackend, accessToken, refreshToken } = resData;
 
+        console.log(
+          "✅ Backend exchange successful, user:",
+          userFromBackend._id
+        );
         const combined = { ...userFromBackend, accessToken, refreshToken };
         setUser(combined);
         localStorage.setItem("user", JSON.stringify(combined));
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        console.log("💾 User saved to localStorage and context");
       } catch (err) {
-        console.error("Backend exchange failed:", err);
+        console.error(
+          "❌ Backend exchange failed:",
+          err.response?.data || err.message
+        );
       } finally {
         setIsLoading(false);
       }
