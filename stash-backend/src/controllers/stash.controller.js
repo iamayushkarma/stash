@@ -1,10 +1,8 @@
 import { Stash } from "../models/stash.model.js";
 import { asyncHandler } from "../utils/async-handler.js";
-import { v2 as cloudinary } from "cloudinary"; // Import Cloudinary
+import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
-import { io } from "../index.js";
 
-// This MUST be at the top
 dotenv.config({
   path: "./.env",
 });
