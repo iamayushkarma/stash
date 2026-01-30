@@ -1,5 +1,6 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useLayoutEffect } from "react";
+import { motion } from "framer-motion";
 import Input from "../../utils/ui/Input";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -18,12 +19,16 @@ function Register() {
     formState: { errors },
     reset,
   } = useForm();
+
+  // Scroll to top on page load
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const getApiUrl = () => {
     const hostname = window.location.hostname;
     console.log("window.location.hostname", hostname);
-
     const port = import.meta.env.VITE_BACKEND_API_PORT;
-
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return `http://localhost:${port}/api/v1/`;
     }
@@ -40,10 +45,8 @@ function Register() {
         withCredentials: true,
       });
       console.log("Response data:", response.data);
-
       const responseData = response.data.data;
       const { user, accessToken, refreshToken } = responseData;
-
       console.log("Access Token:", accessToken);
       console.log("Refresh Token:", refreshToken);
       console.log("User Info:", user);
@@ -52,7 +55,6 @@ function Register() {
         accessToken,
         refreshToken,
       });
-
       navigate("/user/dashboard");
       reset();
     } catch (error) {
@@ -60,21 +62,33 @@ function Register() {
       setMessage(error.response?.data.message || error.message);
     }
   };
+
   const errorClass = "text-error text-sm relative bottom-[0.65rem]";
+
   return (
-    <div className="bg-bg-light-primary select-none dark:bg-bg-dark-primary text-text-light-primary dark:text-text-dark-primary w-full flex">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-bg-light-primary select-none dark:bg-bg-dark-primary text-text-light-primary dark:text-text-dark-primary w-full flex"
+    >
       {/* left ui side  */}
       <AuthWelcomeSidebar />
+
       {/* right ui side  */}
       <div className="py-6 md:p-8 mt-8 w-full md:w-1/2 gap-3 justify-center lg:justify-evenly flex items-center select-none text-text-light-primary dark:text-text-dark-primary">
-        <div className="w-full flex flex-col mt-8 md:mt-10 items-center border-border-light dark:border-border-dark rounded-2xl p-5 md:p-8 sm:w-[25rem] md:w-[32rem] lg:w-[30rem]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full flex flex-col mt-8 md:mt-10 items-center border-border-light dark:border-border-dark rounded-2xl p-5 md:p-8 sm:w-[25rem] md:w-[32rem] lg:w-[30rem]"
+        >
           <div className="font-semibold text-[1.5rem] md:text-[1.8rem] lg:text-[2rem] mb-1">
             Register
           </div>
           <p className="mb-6 text-[.9rem] md:text-[1rem]">
             Create a new account 👋
           </p>
-
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="relative w-11/12"
@@ -122,7 +136,6 @@ function Register() {
             {errors.email && (
               <p className={errorClass}>{errors.email.message}</p>
             )}
-
             {/* password */}
             <Input
               type="password"
@@ -144,24 +157,21 @@ function Register() {
               <p className={errorClass}>{errors.password.message}</p>
             )}
             {message && <div className={errorClass}>{message}</div>}
-
             <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary mt-2">
               By signing in or creating an account, you agree to our{" "}
-              <a href="/terms" className="text-accent hover:underline">
+              <a href="/terms" className="text-primary hover:underline">
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="/privacy" className="text-accent hover:underline">
+              <a href="/privacy" className="text-primary hover:underline">
                 Privacy Policy
               </a>
               .
             </p>
-
             {/* submit button */}
-
             <div>
               <Button
-                type="Submit"
+                type="submit"
                 text="Register"
                 className="w-full mt-3 py-2"
               />
@@ -174,20 +184,19 @@ function Register() {
               </span>
               <hr className="flex-grow border-t border-text-dark-secondary dark:border-border-dark" />
             </div>
-
             <div className="py-2 mt-3 w-full cursor-pointer">
               <LoginWithGoogleBtn />
             </div>
             <div className="mt-4 text-[.9rem] md:text-[1rem] dark:text-text-dark-secondary text-text-light-secondary">
               Already have an account?{" "}
-              <a href="/login" className="underline  cursor-pointer">
+              <a href="/login" className="underline cursor-pointer">
                 Login
               </a>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
