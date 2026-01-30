@@ -1,6 +1,7 @@
 import axios from "axios";
 import { serverUrl } from "../pages/constents";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
+import { UserContext } from "./UserContext";
 
 export const UserImageSnippetContext = createContext();
 
@@ -24,13 +25,17 @@ export const UserImageSnippetContextProvider = ({ children }) => {
     return { totalStashes, totalTexts, uniqueCategories };
   };
 
-  // We combine all setup logic into a single useEffect hook
+  // Wait for auth state before fetching user-specific data
+  const { user, isLoading } = useContext(UserContext);
+
   useEffect(() => {
-    // --- 1. Initial Data Fetch ---
+    if (isLoading) return;
+    if (!user) return;
+
     const fetchInitialData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("accessToken");
+        const token = user?.accessToken || localStorage.getItem("accessToken");
         if (!token) throw new Error("Not authenticated");
 
         const response = await axios.get(`${serverUrl}stashes/imageSnippets`, {
@@ -42,7 +47,6 @@ export const UserImageSnippetContextProvider = ({ children }) => {
         setAllSnippets(data);
         console.log("Text data", data);
 
-        // Calculate stats based on the initial fetch
         setStats(calculateStats(data));
       } catch (error) {
         console.error("Error fetching initial data:", error);
@@ -52,7 +56,7 @@ export const UserImageSnippetContextProvider = ({ children }) => {
     };
 
     fetchInitialData();
-  }, []);
+  }, [user, isLoading]);
 
   return (
     <UserImageSnippetContext.Provider

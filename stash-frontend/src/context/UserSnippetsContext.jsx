@@ -1,6 +1,7 @@
 import axios from "axios";
 import { serverUrl } from "../pages/constents";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
+import { UserContext } from "./UserContext";
 
 export const UserSnippetContext = createContext();
 
@@ -26,13 +27,18 @@ export const UserSnippetContextProvider = ({ children }) => {
     return { totalStashes, totalImages, totalTexts, uniqueCategories };
   };
 
-  // We combine all setup logic into a single useEffect hook
+  // Wait for auth state before fetching user-specific data
+  const { user, isLoading } = useContext(UserContext);
+
   useEffect(() => {
+    if (isLoading) return; // still loading auth
+    if (!user) return; // not authenticated
+
     // --- 1. Initial Data Fetch ---
     const fetchInitialData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("accessToken");
+        const token = user?.accessToken || localStorage.getItem("accessToken");
         if (!token) throw new Error("Not authenticated");
 
         const response = await axios.get(`${serverUrl}stashes`, {
@@ -54,7 +60,7 @@ export const UserSnippetContextProvider = ({ children }) => {
     };
 
     fetchInitialData();
-  }, []);
+  }, [user, isLoading]);
 
   return (
     <UserSnippetContext.Provider

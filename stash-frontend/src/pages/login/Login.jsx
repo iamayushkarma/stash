@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import { motion } from "framer-motion";
 import Input from "../../utils/ui/Input";
 import { useForm } from "react-hook-form";
@@ -10,7 +10,7 @@ import AuthWelcomeSidebar from "../../utils/ui/AuthWelcomeSidebar";
 import LoginWithGoogleBtn from "../../utils/ui/Buttons/LoginWithGoogleBtn";
 
 function Login() {
-  const { login } = useUserContext();
+  const { login, user, isLoading } = useUserContext();
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const {
@@ -24,6 +24,13 @@ function Login() {
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // If user is already authenticated (e.g., returned from Google redirect), navigate to dashboard
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/user/dashboard", { replace: true });
+    }
+  }, [user, isLoading, navigate]);
 
   const getApiUrl = () => {
     const hostname = window.location.hostname;

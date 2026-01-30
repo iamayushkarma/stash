@@ -23,7 +23,7 @@ function AuthWelcomeSidebar() {
           <picture>
             <source
               className="w-102"
-              srcset="/images/security-image.webp"
+              srcSet="/images/security-image.webp"
               type="image/webp"
             />
             <img
