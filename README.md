@@ -1,28 +1,25 @@
 # 📌 Stash - Smart Content Management System
 
-A comprehensive full-stack application for saving, organizing, and managing web content including text snippets and images. Stash consists of a powerful backend API, a responsive React frontend, and a browser extension for seamless content capture.
+A comprehensive full-stack application for saving, organizing, and managing web content including text snippets and images. Built with React, Node.js, MongoDB, and deployed on Render (backend) and Vercel (frontend).
 
 ## 🌟 Features
 
-### 🔐 Core Features
+- **User Authentication** - Secure JWT + Firebase OAuth (Google Sign-In)
+- **Content Management** - Save and organize text snippets and images
+- **Browser Extension** - Capture content directly from any website
+- **Theme Support** - Dark and light mode across all platforms
+- **Search & Filter** - Real-time search with category organization
+- **Cloud Storage** - Images stored securely on Cloudinary
+- **Responsive Design** - Mobile-first approach for all devices
 
-- **User Authentication**: Secure registration and login with JWT tokens
-- **Content Management**: Save and organize text snippets and images
-- **Browser Extension**: Capture content directly from any website
-- **Theme Support**: Light and dark mode across all platforms
-- **Search & Filter**: Quickly find saved content
-- **Category Organization**: Organize content by custom categories
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+## 🔧 Tech Stack
 
-### 🚀 Advanced Features
+**Backend:** Node.js, Express, MongoDB, JWT, Cloudinary  
+**Frontend:** React 18, Vite, Tailwind CSS, Firebase Auth, Axios  
+**Extension:** React, Chrome Manifest V3, Chrome Storage API  
+**Deployment:** Render (Backend), Vercel (Frontend)
 
-- **Real-time Synchronization**: Instant sync between extension and web app
-- **User Account Management**: Manage profile and preferences
-- **Content Export**: Export your collections
-- **Health Check**: API monitoring and status checks
-- **Error Handling**: Comprehensive error management and user feedback
-
-## 📁 Project Structure
+## 📁 Complete Project Structure
 
 ```
 Stash/
@@ -56,7 +53,8 @@ Stash/
 │   │   │   └── index.js
 │   │   ├── app.js
 │   │   └── index.js
-│   ├── .env
+│   ├── .env.example
+│   ├── .gitignore
 │   ├── package-lock.json
 │   └── package.json
 ├── stash-extension/
@@ -81,6 +79,7 @@ Stash/
 │   │   ├── index.css
 │   │   ├── index.jsx
 │   │   └── main.jsx
+│   ├── .env.example
 │   ├── .gitignore
 │   ├── README.md
 │   ├── eslint.config.js
@@ -187,7 +186,7 @@ Stash/
 │   │   ├── App.jsx
 │   │   ├── index.js
 │   │   └── main.jsx
-│   ├── .env
+│   ├── .env.example
 │   ├── .gitignore
 │   ├── README.md
 │   ├── eslint.config.js
@@ -205,384 +204,137 @@ Stash/
 └── tree.js
 ```
 
-## 🔧 Tech Stack
+## 📦 Prerequisites
 
-### Backend
+- Node.js v16+ - [Download](https://nodejs.org/)
+- MongoDB Atlas account - [Sign up](https://www.mongodb.com/cloud/atlas)
+- Firebase account - [Console](https://console.firebase.google.com/)
+- Cloudinary account - [Sign up](https://cloudinary.com/)
+- Chrome browser (for extension)
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB
-- **Authentication**: JWT (JSON Web Tokens)
-- **Validation**: Custom validators
+---
 
-### Frontend
+## 🔥 Firebase OAuth Setup
 
-- **Framework**: React 18+
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **State Management**: Context API
-- **HTTP Client**: Axios/Fetch API
-- **Authentication**: Firebase
+### Step 1: Create Firebase Project
 
-### Browser Extension
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Click **"Create a project"** → Enter name "Stash" → Continue
+3. Disable Google Analytics (optional) → Create project
 
-- **Manifest Version**: 3
-- **Build Tool**: Vite
-- **Framework**: React
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom React Components
+### Step 2: Register Web App
 
-## 📦 Installation & Setup
+1. Click Web icon (`</>`) → App nickname: "Stash Web" → Register app
+2. Copy the configuration object:
 
-### Prerequisites
+```javascript
+const firebaseConfig = {
+  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.firebasestorage.app",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef123456",
+  measurementId: "G-XXXXXXXXXX",
+};
+```
 
-- Node.js (v14 or higher)
-- npm or pnpm
-- MongoDB (local or cloud)
-- Chrome/Chromium browser (for extension)
+### Step 3: Enable Authentication
 
-### 1️⃣ Backend Setup
+1. Navigate to **Authentication** → **Get started** → **Sign-in method** tab
+2. Enable **Email/Password** → Save
+3. Enable **Google** → Select support email → Save
+
+### Step 4: Configure OAuth Consent Screen
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Select your Firebase project → **APIs & Services** → **OAuth consent screen**
+3. Select **External** → Fill required fields:
+   - App name: Stash
+   - User support email: your-email@example.com
+4. **Scopes** → Add: `userinfo.email`, `userinfo.profile` → Save
+
+### Step 5: Configure Redirect URIs
+
+1. **APIs & Services** → **Credentials** → OAuth 2.0 Client ID
+2. **Authorized JavaScript origins**:
+   ```
+   http://localhost:5173
+   https://your-production-domain.com
+   ```
+3. **Authorized redirect URIs**:
+   ```
+   http://localhost:5173/__/auth/handler
+   https://your-project.firebaseapp.com/__/auth/handler
+   https://your-production-domain.com/__/auth/handler
+   ```
+4. Save
+
+### Step 6: Add Authorized Domains
+
+1. Firebase Console → **Authentication** → **Settings** → **Authorized domains**
+2. Add:
+   - `localhost` (pre-added)
+   - Your Vercel domain (after deployment)
+   - Chrome extension ID: `chrome-extension://YOUR_EXTENSION_ID`
+
+---
+
+## 🗄️ MongoDB Setup
+
+### MongoDB Atlas (Recommended)
+
+1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) → Create free cluster
+2. Create database user (username + password)
+3. **Network Access** → Add IP: `0.0.0.0/0` (allow all)
+4. Click **Connect** → **Connect your application** → Copy connection string:
+   ```
+   mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/stashDB?retryWrites=true&w=majority
+   ```
+5. Replace `<username>` and `<password>` with your credentials
+
+---
+
+## ☁️ Cloudinary Setup
+
+1. Sign up at [Cloudinary](https://cloudinary.com/) → Dashboard
+2. Copy credentials:
+   - **Cloud Name**
+   - **API Key**
+   - **API Secret** (click "Reveal")
+
+---
+
+## 1️⃣ Backend Setup
 
 ```bash
-# Navigate to backend directory
-cd stash-backend
+# Clone and navigate
+git clone https://github.com/yourusername/stash.git
+cd stash/stash-backend
 
 # Install dependencies
 npm install
 
 # Create .env file
 cp .env.example .env
-
-# Configure environment variables
-# DATABASE_URL=your_mongodb_connection_string
-# PORT=5000
-# JWT_SECRET=your_jwt_secret
-# NODE_ENV=development
-
-# Start the server
-npm start
 ```
 
-**Available Backend Scripts:**
-
-- `npm start` - Start development server
-- `npm test` - Run tests
-- `npm run build` - Build for production
-
-### 2️⃣ Frontend Setup
-
-```bash
-# Navigate to frontend directory
-cd stash-frontend
-
-# Install dependencies
-npm install
-
-# Create .env file
-cp .env.example .env
-
-# Configure environment variables
-# VITE_API_URL=http://localhost:5000
-# VITE_FIREBASE_CONFIG=your_firebase_config
-
-# Start development server
-npm run dev
-```
-
-**Available Frontend Scripts:**
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-### 3️⃣ Browser Extension Setup
-
-```bash
-# Navigate to extension directory
-cd stash-extension
-
-# Install dependencies
-npm install
-# or
-pnpm install
-
-# Build the extension
-npm run build
-
-# Start development server
-npm run dev
-```
-
-**To Install Extension in Chrome:**
-
-1. Open `chrome://extensions/`
-2. Enable "Developer mode" (top right)
-3. Click "Load unpacked"
-4. Select the `dist` folder from `stash-extension/`
-
-**Available Extension Scripts:**
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-#### Register User
-
-```
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "securepassword",
-  "username": "username"
-}
-```
-
-#### Login User
-
-```
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-
-### Stash Endpoints
-
-#### Create Stash (Text/Image)
-
-```
-POST /api/stash
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "title": "My snippet",
-  "content": "Content here",
-  "category": "work",
-  "type": "text" // or "image"
-}
-```
-
-#### Get All Stashes
-
-```
-GET /api/stash
-Authorization: Bearer <token>
-```
-
-#### Get Stash by ID
-
-```
-GET /api/stash/:id
-Authorization: Bearer <token>
-```
-
-#### Update Stash
-
-```
-PUT /api/stash/:id
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "title": "Updated title",
-  "category": "updated-category"
-}
-```
-
-#### Delete Stash
-
-```
-DELETE /api/stash/:id
-Authorization: Bearer <token>
-```
-
-### User Endpoints
-
-#### Get User Profile
-
-```
-GET /api/user/profile
-Authorization: Bearer <token>
-```
-
-#### Update User Profile
-
-```
-PUT /api/user/profile
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "username": "newusername",
-  "email": "newemail@example.com"
-}
-```
-
-### Health Check
-
-```
-GET /api/health
-```
-
-Returns: `{ "status": "OK" }`
-
-## 🎯 Core Components & Architecture
-
-### Backend Architecture
-
-**Controllers** - Handle business logic
-
-- `healthcheck.controller.js` - API health monitoring
-- `stash.controller.js` - Stash/snippet management
-- `user.controller.js` - User account management
-
-**Models** - Database schemas
-
-- `user.model.js` - User data structure
-- `stash.model.js` - Stash/snippet data structure
-
-**Middlewares** - Request processing
-
-- `auth.middleware.js` - JWT authentication
-- `validator.middleware.js` - Input validation
-
-**Routes** - API endpoints
-
-- `auth.route.js` - Authentication routes
-- `stash.route.js` - Stash management routes
-- `healthcheck.route.js` - Health check routes
-
-**Utilities** - Helper functions
-
-- `api-error.js` - Centralized error handling
-- `api-response.js` - Standardized response format
-- `async-handler.js` - Async error wrapper
-
-### Frontend Structure
-
-**Pages** - Main application screens
-
-- `Home.jsx` - Landing page
-- `Dashboard/` - User dashboard with multiple sub-pages
-- `Login/Register` - Authentication pages
-- `About/Contact/Docs/Terms/Privacy` - Information pages
-
-**Components** - Reusable UI elements
-
-- Navigation & Sidebar components
-- Dashboard sections (Hero, Features, How It Works)
-- UI components (Input, Buttons, Loading states)
-
-**Context** - State management
-
-- `UserContext` - User authentication state
-- `ThemeContext` - Dark/Light theme
-- `ToastContext` - Toast notifications
-- `UserSnippetsContext` - Snippet management
-- Content-specific contexts for images and text
-
-**Hooks** - Custom React hooks
-
-- `useUserContext` - Access user state
-- `useTheme` - Theme management
-- `useDebounce` - Debounced search
-- `useUserSnippetContext` - Snippet operations
-
-### Extension Architecture
-
-**Content Scripts**
-
-- `content-sync.js` - Synchronize data between extension and web app
-- `getSelection.js` - Get selected text from webpage
-- `background.js` - Background service worker
-
-**Components**
-
-- `App.jsx` - Main extension interface
-- `StashToast/` - Toast notification system
-
-## 🔐 Security Features
-
-- JWT-based authentication
-- Password hashing
-- Environment variable protection
-- Input validation and sanitization
-- CORS configuration
-- Protected API routes
-- Secure user session management
-
-## 🎨 UI/UX Features
-
-- **Responsive Design**: Mobile-first approach
-- **Theme Support**: Dark and light modes
-- **Toast Notifications**: User feedback system
-- **Loading States**: Skeleton loaders
-- **Error Handling**: User-friendly error messages
-- **Accessibility**: Semantic HTML and ARIA labels
-
-## 🚀 Deployment
-
-### Backend Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Set production environment variables
-NODE_ENV=production
-
-# Deploy to hosting (Heroku, Vercel, AWS, etc.)
-```
-
-### Frontend Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Deploy dist folder to hosting (Vercel, Netlify, GitHub Pages, etc.)
-```
-
-### Extension Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Submit to Chrome Web Store with dist folder
-```
-
-## 📝 Environment Variables
-
-### Backend (.env)
+**Edit `stash-backend/.env`:**
 
 ```env
-# PORT
+# Server
 PORT=8000
 
 # MongoDB
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/stashDB
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/stashDB?retryWrites=true&w=majority
 
-# CORS
-CORS_ORIGIN=https://trystash.vercel.app,http://localhost:5173
+# CORS (update after frontend deployment)
+CORS_ORIGIN=http://localhost:5173
 
-# JWT
-ACCESS_TOKEN_SECRET=your_access_token_secret_key
+# JWT Secrets (generate with commands below)
+ACCESS_TOKEN_SECRET=your_generated_secret_min_32_chars
 ACCESS_TOKEN_EXPIRY=1d
-
-REFRESH_TOKEN_SECRET=your_refresh_token_secret_key
+REFRESH_TOKEN_SECRET=your_different_generated_secret_min_32_chars
 REFRESH_TOKEN_EXPIRY=10d
 
 # Cloudinary
@@ -591,185 +343,1003 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-### Frontend (.env)
-
-```env
-# Backend API Port
-VITE_BACKEND_API_PORT=8000
-
-# Firebase Configuration
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=stash-xxxxx.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=stash-xxxxx
-VITE_FIREBASE_STORAGE_BUCKET=stash-xxxxx.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXX
-
-# Chrome Extension ID
-VITE_CHROME_EXTENSION_ID=your_extension_id
-```
-
-### Browser Extension
-
-The extension uses the same Firebase configuration as the frontend. No separate .env needed if communicating with frontend
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-
-# Authentication
-
-VITE_JWT_STORAGE_KEY=stash_auth_token
-VITE_USER_STORAGE_KEY=stash_user_data
-
-# Feature Flags
-
-VITE_ENABLE_ANALYTICS=true
-VITE_ENABLE_ERROR_TRACKING=true
-VITE_ENABLE_DARK_MODE=true
-VITE_ENABLE_PUSH_NOTIFICATIONS=true
-
-# Debug Configuration
-
-VITE_DEBUG_MODE=false
-VITE_DEBUG_API_CALLS=false
-
-# Cloudinary Configuration
-
-VITE_CLOUDINARY_CLOUD_NAME=
-VITE_CLOUDINARY_UPLOAD_PRESET=
-
-# Analytics
-
-VITE_GOOGLE_ANALYTICS_ID=
-VITE_SENTRY_DSN=
-
-````
-
-#### Browser Extension - .env.example
-
-```env
-# Copy this file to .env and fill in your values
-
-# Extension Configuration
-VITE_EXTENSION_NAME=Stash
-VITE_EXTENSION_VERSION=1.0.0
-VITE_EXTENSION_DESCRIPTION=Save and organize web content effortlessly
-
-# API Configuration
-VITE_API_URL=http://localhost:5000
-VITE_API_PREFIX=/api/v1
-
-# Firebase Configuration
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-
-# Storage Configuration
-VITE_STORAGE_KEY_PREFIX=stash_ext_
-VITE_SYNC_INTERVAL=5000
-
-# Content Capture Configuration
-VITE_MAX_CONTENT_SIZE=5242880
-VITE_SUPPORTED_CONTENT_TYPES=text/plain,text/html,image/jpeg,image/png
-
-# Messaging
-VITE_ENABLE_NOTIFICATIONS=true
-VITE_NOTIFICATION_TIMEOUT=5000
-
-# Debug
-VITE_DEBUG_MODE=false
-````
-
-### Environment Setup Instructions
-
-#### For Backend:
+**Generate JWT Secrets:**
 
 ```bash
-cd stash-backend
-cp .env.example .env
-# Edit .env with your actual values
+node -e "console.log('ACCESS_TOKEN_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
+node -e "console.log('REFRESH_TOKEN_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-#### For Frontend:
+**Start backend:**
 
 ```bash
-cd stash-frontend
-cp .env.example .env
-# Edit .env with your actual values
+npm start
+# Server running on http://localhost:8000
 ```
 
-#### For Extension:
+**Test health check:**
 
 ```bash
-cd stash-extension
-cp .env.example .env
-# Edit .env with your actual values
+curl http://localhost:8000/api/health
 ```
-
-### Important Notes on Environment Variables
-
-- ⚠️ **Never commit .env files to version control**
-- 🔐 **Use strong JWT secrets in production** (min 32 characters)
-- 🗄️ **Use MongoDB Atlas for production databases** (not localhost)
-- 📧 **Set up email credentials** for password reset functionality
-- 🔑 **Keep Firebase credentials secure** and limit by domain
-- 💾 **Use cloud storage** (Cloudinary/AWS S3) for file uploads in production
-- 🌐 **Update CORS_ORIGIN** to match your frontend domain in production
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📋 Code Quality
-
-- **Linting**: ESLint configured for code style consistency
-- **Formatting**: Prettier for code formatting
-- **Validation**: Input validators for API requests
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support & Troubleshooting
-
-### Common Issues
-
-**Backend Connection Failed**
-
-- Ensure MongoDB is running
-- Check DATABASE_URL in .env
-- Verify network connectivity
-
-**Frontend API Errors**
-
-- Verify backend is running on correct port
-- Check VITE_API_URL in .env
-- Review browser console for CORS errors
-
-**Extension Not Loading**
-
-- Clear extension cache
-- Rebuild extension: `npm run build`
-- Check manifest.json validity
-- Enable developer mode in Chrome
-
-## 📞 Contact & Support
-
-For issues, feature requests, or questions:
-
-- Open an issue on GitHub
-- Check documentation at `/docs`
-- Contact through the application's contact page
 
 ---
 
-**Last Updated**: January 2026
+## 2️⃣ Frontend Setup
+
+```bash
+cd ../stash-frontend
+
+# Install dependencies
+npm install
+
+# Create .env file
+cp .env.example .env
+```
+
+**Edit `stash-frontend/.env`:**
+
+```env
+# Backend API
+VITE_BACKEND_API_PORT=8000
+
+# Firebase (from Firebase Console → Project Settings)
+VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
+VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# Chrome Extension ID (add after building extension)
+VITE_CHROME_EXTENSION_ID=
+```
+
+**Start frontend:**
+
+```bash
+npm run dev
+# Running on http://localhost:5173
+```
+
+---
+
+## 3️⃣ Extension Setup
+
+```bash
+cd ../stash-extension
+
+# Install dependencies
+npm install
+
+# Create .env file
+cp .env.example .env
+```
+
+**Edit `stash-extension/.env`:**
+
+```env
+# Same Firebase config as frontend
+VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
+VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+**Build and install:**
+
+```bash
+# Build extension
+npm run build
+
+# Install in Chrome:
+# 1. Open chrome://extensions/
+# 2. Enable Developer mode
+# 3. Load unpacked → Select stash-extension/dist folder
+# 4. Copy Extension ID shown
+```
+
+**Update configs with Extension ID:**
+
+1. Add to `stash-frontend/.env`: `VITE_CHROME_EXTENSION_ID=your_extension_id`
+2. Add to Firebase Authorized domains: `chrome-extension://your_extension_id`
+3. Restart frontend
+
+---
+
+## 🌐 Deployment
+
+### Backend - Deploy to Render
+
+1. **Push code to GitHub**
+
+   ```bash
+   git add .
+   git commit -m "Deploy backend"
+   git push origin main
+   ```
+
+2. **Create Web Service on Render**
+   - Go to [render.com](https://render.com/) → Sign in with GitHub
+   - **New** → **Web Service** → Connect repository
+   - Configure:
+     - **Name:** stash-backend
+     - **Root Directory:** `stash-backend`
+     - **Environment:** Node
+     - **Build Command:** `npm install`
+     - **Start Command:** `npm start`
+     - **Instance Type:** Free
+
+3. **Add Environment Variables**
+
+   In Render dashboard → **Environment** tab, add:
+
+   ```
+   PORT=8000
+   MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/stashDB?retryWrites=true&w=majority
+   CORS_ORIGIN=https://your-frontend.vercel.app
+   ACCESS_TOKEN_SECRET=your_generated_secret
+   ACCESS_TOKEN_EXPIRY=1d
+   REFRESH_TOKEN_SECRET=your_different_secret
+   REFRESH_TOKEN_EXPIRY=10d
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   ```
+
+4. **Deploy & Get URL**
+   - Click **Create Web Service**
+   - Copy your backend URL: `https://stash-backend-xxxx.onrender.com`
+
+### Frontend - Deploy to Vercel
+
+**Method 1: Vercel CLI**
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+cd stash-frontend
+
+# Login and deploy
+vercel login
+vercel
+
+# Production deployment
+vercel --prod
+```
+
+**Method 2: Vercel Dashboard (Recommended)**
+
+1. Go to [vercel.com](https://vercel.com/) → **Add New** → **Project**
+2. Import GitHub repository
+3. Configure:
+   - **Framework Preset:** Vite
+   - **Root Directory:** `stash-frontend`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+
+4. **Add Environment Variables** (Settings → Environment Variables):
+
+   ```
+   VITE_BACKEND_API_PORT=https://stash-backend-xxxx.onrender.com
+   VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-project-id
+   VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+   VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+   VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
+   VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+   VITE_CHROME_EXTENSION_ID=your_extension_id
+   ```
+
+5. **Deploy** → Get URL: `https://your-app.vercel.app`
+
+6. **Update Backend CORS**
+   - Render → Environment → Update `CORS_ORIGIN`:
+     ```
+     CORS_ORIGIN=https://your-app.vercel.app,http://localhost:5173
+     ```
+   - Redeploy backend
+
+---
+
+## 📚 API Documentation
+
+### Base URL
+
+- Development: `http://localhost:8000/api`
+- Production: `https://your-backend.onrender.com/api`
+
+### Authentication
+
+**Register**
+
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!",
+  "username": "johndoe"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "...", "email": "...", "username": "..." },
+    "accessToken": "eyJhbG...",
+    "refreshToken": "eyJhbG..."
+  },
+  "message": "User registered successfully"
+}
+```
+
+**Login**
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+**Refresh Token**
+
+```http
+POST /auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbG..."
+}
+```
+
+**Logout**
+
+```http
+POST /auth/logout
+Authorization: Bearer <access_token>
+```
+
+### Stash/Snippets
+
+**Create Text Stash**
+
+```http
+POST /stash
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "JavaScript Tips",
+  "content": "Use const and let instead of var",
+  "category": "coding",
+  "type": "text"
+}
+```
+
+**Create Image Stash**
+
+```http
+POST /stash
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+{
+  "title": "Design Inspiration",
+  "image": <file>,
+  "category": "design",
+  "type": "image"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "stash_id",
+    "title": "JavaScript Tips",
+    "content": "Use const and let instead of var",
+    "category": "coding",
+    "type": "text",
+    "userId": "user_id",
+    "createdAt": "2026-01-31T10:00:00.000Z"
+  },
+  "message": "Stash created successfully"
+}
+```
+
+**Get All Stashes**
+
+```http
+GET /stash?page=1&limit=10&category=coding&search=javascript&type=text
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+- `category` (optional): Filter by category
+- `search` (optional): Search in title and content
+- `type` (optional): Filter by type (text/image)
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "stashes": [...],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 5,
+      "totalItems": 47,
+      "itemsPerPage": 10
+    }
+  }
+}
+```
+
+**Get Single Stash**
+
+```http
+GET /stash/:id
+Authorization: Bearer <token>
+```
+
+**Update Stash**
+
+```http
+PUT /stash/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Updated Title",
+  "category": "new-category"
+}
+```
+
+**Delete Stash**
+
+```http
+DELETE /stash/:id
+Authorization: Bearer <token>
+```
+
+### User
+
+**Get Profile**
+
+```http
+GET /user/profile
+Authorization: Bearer <token>
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "user_id",
+    "email": "user@example.com",
+    "username": "johndoe",
+    "createdAt": "2026-01-15T08:30:00.000Z",
+    "stats": {
+      "totalStashes": 47,
+      "textStashes": 32,
+      "imageStashes": 15
+    }
+  }
+}
+```
+
+**Update Profile**
+
+```http
+PUT /user/profile
+Authorization: Bearer <token>
+
+{
+  "username": "newname",
+  "email": "new@email.com"
+}
+```
+
+**Change Password**
+
+```http
+PUT /user/password
+Authorization: Bearer <token>
+
+{
+  "currentPassword": "OldPass123!",
+  "newPassword": "NewPass123!"
+}
+```
+
+**Delete Account**
+
+```http
+DELETE /user/account
+Authorization: Bearer <token>
+
+{
+  "password": "UserPass123!",
+  "confirmation": "DELETE"
+}
+```
+
+### Health Check
+
+```http
+GET /health
+```
+
+**Response:**
+
+```json
+{
+  "status": "OK",
+  "timestamp": "2026-01-31T10:00:00.000Z",
+  "uptime": 3600,
+  "database": "connected"
+}
+```
+
+### Error Responses
+
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "errors": [
+    {
+      "field": "email",
+      "message": "Invalid email format"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `409` - Conflict
+- `500` - Internal Server Error
+
+---
+
+## 🎯 Architecture Overview
+
+### Backend Components
+
+**Controllers** - Business logic for requests
+
+- `healthcheck.controller.js` - API health monitoring
+- `stash.controller.js` - CRUD operations for stashes
+- `user.controller.js` - User management and auth
+
+**Models** - MongoDB schemas
+
+- `user.model.js` - User data with authentication
+- `stash.model.js` - Stash/snippet data with categories
+
+**Middlewares** - Request processing
+
+- `auth.middleware.js` - JWT verification
+- `validator.middleware.js` - Input validation
+- `multer.middleware.js` - File upload handling
+- `error.middleware.js` - Global error handling
+
+**Routes** - API endpoints
+
+- `auth.route.js` - Authentication routes
+- `stash.route.js` - Stash management routes
+- `user.route.js` - User profile routes
+- `healthcheck.route.js` - Health monitoring
+
+**Utilities**
+
+- `api-error.js` - Custom error classes
+- `api-response.js` - Standardized responses
+- `async-handler.js` - Async/await wrapper
+- `cloudinary.js` - Image upload utility
+- `jwt.js` - Token generation/verification
+
+**Database**
+
+- `db/index.js` - MongoDB connection with Mongoose
+
+### Frontend Components
+
+**Pages**
+
+- `Home.jsx` - Landing page with features
+- `Login.jsx` / `Register.jsx` - Authentication
+- `About.jsx`, `Contact.jsx`, `Docs.jsx` - Info pages
+- `Dashboard/` - User dashboard suite
+  - `DashboardHome.jsx` - Overview and stats
+  - `Snippets.jsx` - Text snippets list
+  - `Image.jsx` - Image stashes list
+  - `Categories.jsx` - Category management
+  - `UserAccount.jsx` - Profile settings
+  - `Help.jsx` - Help and support
+
+**Components**
+
+- **Navigation:** `Navbar.jsx`, `DashboardNavbar.jsx`, `DashboardSidebar.jsx`, `Footer.jsx`
+- **Landing Sections:** `HeroSection.jsx`, `FeatureSection.jsx`, `HowItWorks.jsx`, `UseCasesSection.jsx`
+- **Auth:** `ProtectedRoute.jsx` - Route protection
+
+**Context (State Management)**
+
+- `UserContext.jsx` - User auth state
+- `ThemeContext.jsx` - Dark/light theme
+- `ToastContext.jsx` - Toast notifications
+- `UserSnippetsContext.jsx` - Snippet management
+- `UserTextSnippetsContent.jsx` - Text snippets
+- `UserImageSnippetsContent.jsx` - Image snippets
+
+**Custom Hooks**
+
+- `useUserContext.js` - User state access
+- `useTheme.js` - Theme management
+- `useDebounce.js` - Debounced input
+- `useUserSnippetContext.js` - Snippet CRUD
+- `useUpdateUser.js` - Profile updates
+
+**Utilities**
+
+- `copyToClipboard.jsx` - Clipboard utility
+- `Input.jsx`, `LoadingSkleton.jsx` - UI components
+- `Firebase.js` - Firebase SDK initialization
+
+**Layouts**
+
+- `MainLayout.jsx` - Main app wrapper (Navbar + Content + Footer)
+
+### Extension Architecture
+
+**Manifest & Scripts**
+
+- `manifest.json` - Extension config (Manifest V3)
+- `background.js` - Service worker
+- `content-sync.js` - Data sync
+- `getSelection.js` - Text capture
+
+**UI**
+
+- `App.jsx` - Extension popup
+- `StashToast/` - Toast notification system
+
+**Communication Flow:**
+
+```
+Web Page → Content Script → Background Script → Extension Popup → Backend API → Web Dashboard
+```
+
+---
+
+## 🔐 Security Features
+
+**Backend Security:**
+
+- JWT authentication (access + refresh tokens)
+- Password hashing with bcrypt
+- Input validation & sanitization
+- CORS protection
+- Environment variable protection
+- Mongoose parameterized queries
+
+**Frontend Security:**
+
+- Firebase OAuth (Google Sign-In)
+- Protected routes with guards
+- Secure token storage
+- HTTPS enforcement
+- Input sanitization
+
+**Extension Security:**
+
+- Manifest V3 standards
+- Content Security Policy
+- Minimal permissions
+- Secure messaging
+- No inline scripts
+
+**Data Security:**
+
+- HTTPS for all API calls
+- Cloudinary secure URLs
+- User data isolation
+- File type validation
+- Size limits on uploads
+
+---
+
+## 🎨 UI/UX Features
+
+**Design System:**
+
+- Responsive mobile-first design
+- Dark/light theme with system detection
+- Tailwind CSS utilities
+- Consistent color palette
+- Typography hierarchy
+
+**User Experience:**
+
+- Toast notifications for feedback
+- Skeleton loaders for performance
+- User-friendly error messages
+- Empty state handling
+- Real-time search with debouncing
+- Pagination for large datasets
+- Keyboard navigation support
+- Real-time form validation
+
+**Accessibility:**
+
+- Semantic HTML5
+- ARIA labels
+- Clear focus states
+- WCAG AA contrast ratios
+- Descriptive alt text
+- Skip links for navigation
+
+**Performance:**
+
+- Code splitting & lazy loading
+- Cloudinary image optimization
+- Debounced search
+- React.memo memoization
+- Vite optimized builds
+
+---
+
+## 📝 Environment Variables
+
+### Backend (.env)
+
+```env
+# Server Configuration
+PORT=8000
+
+# MongoDB Connection
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/stashDB?retryWrites=true&w=majority
+
+# CORS (comma-separated, no spaces)
+CORS_ORIGIN=https://your-app.vercel.app,http://localhost:5173
+
+# JWT Configuration
+ACCESS_TOKEN_SECRET=your_generated_secret_min_32_characters
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_SECRET=your_different_generated_secret_min_32_characters
+REFRESH_TOKEN_EXPIRY=10d
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+**Notes:**
+
+- Generate JWT secrets: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+- Use MongoDB Atlas for production
+- Update CORS_ORIGIN with production frontend URL
+- Never commit .env files to Git
+
+### Frontend (.env)
+
+```env
+# Backend API
+VITE_BACKEND_API_PORT=8000  # Development
+# VITE_BACKEND_API_PORT=https://your-backend.onrender.com  # Production
+
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
+VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# Chrome Extension ID
+VITE_CHROME_EXTENSION_ID=abcdefghijklmnopqrstuvwxyz123456
+```
+
+**Notes:**
+
+- Get Firebase config from Firebase Console → Project Settings
+- For production, use full backend URL
+- Add extension ID after building extension
+
+### Extension (.env)
+
+```env
+# Firebase (same as frontend)
+VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
+VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+**Notes:**
+
+- Use same Firebase project as frontend
+- Add extension ID to Firebase authorized domains
+
+---
+
+## 🛠️ Troubleshooting
+
+### Backend Issues
+
+**MongoDB Connection Failed**
+
+```
+Error: MongooseServerSelectionError
+```
+
+Solutions:
+
+- Check MONGO_URI in .env
+- Whitelist IP in MongoDB Atlas (0.0.0.0/0)
+- Verify credentials
+- Test connection string
+
+**CORS Error**
+
+```
+Access blocked by CORS policy
+```
+
+Solutions:
+
+- Update CORS_ORIGIN in backend .env
+- Include frontend URL (no trailing slash)
+- Restart backend server
+- Clear browser cache
+
+**JWT Error**
+
+```
+JsonWebTokenError: invalid signature
+```
+
+Solutions:
+
+- Verify ACCESS_TOKEN_SECRET matches
+- Clear browser localStorage
+- Re-login to get new token
+- Check token hasn't expired
+
+**Cloudinary Upload Failed**
+
+```
+Invalid cloud_name
+```
+
+Solutions:
+
+- Verify Cloudinary credentials in .env
+- Check API key and secret
+- Ensure cloud name is correct
+- Test in Cloudinary console
+
+### Frontend Issues
+
+**API Connection Failed**
+
+```
+Failed to fetch
+```
+
+Solutions:
+
+- Ensure backend is running
+- Check VITE_BACKEND_API_PORT in .env
+- Verify CORS is configured
+- Check browser console for details
+
+**Firebase Auth Error**
+
+```
+auth/invalid-api-key
+```
+
+Solutions:
+
+- Verify all Firebase env variables
+- Check Firebase project status
+- Ensure authorized domains configured
+- Verify OAuth is enabled
+
+**Build Error**
+
+```
+Cannot find module
+```
+
+Solutions:
+
+- Delete node_modules: `rm -rf node_modules`
+- Reinstall: `npm install`
+- Clear cache: `npm cache clean --force`
+- Check Node.js version (16+)
+
+### Extension Issues
+
+**Extension Not Loading**
+Solutions:
+
+- Rebuild: `npm run build`
+- Load dist folder, not src
+- Enable Developer Mode in Chrome
+- Check manifest.json syntax
+
+**Can't Save Content**
+Solutions:
+
+- Verify user is logged in
+- Check Firebase config matches frontend
+- Review extension permissions
+- Check background script errors
+
+**Sync Failed**
+Solutions:
+
+- Ensure backend is accessible
+- Verify CORS includes extension ID
+- Check extension storage permissions
+- Clear extension data and re-login
+
+### Debug Commands
+
+```bash
+# Backend logs
+npm run dev
+
+# Frontend console
+# F12 → Console tab
+
+# Extension logs
+# Right-click extension → Inspect popup
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit: `git commit -m 'Add amazing feature'`
+4. Push: `git push origin feature/amazing-feature`
+5. Open Pull Request
+
+**Code Style:**
+
+- Use ESLint and Prettier
+- Follow existing patterns
+- Add comments for complex logic
+- Update documentation
+- Test before submitting
+
+---
+
+## 📋 Scripts Reference
+
+### Backend
+
+```bash
+npm start       # Start server
+npm run dev     # Development with nodemon
+npm test        # Run tests
+npm run lint    # ESLint
+```
+
+### Frontend
+
+```bash
+npm run dev     # Development server
+npm run build   # Production build
+npm run preview # Preview build
+npm run lint    # ESLint
+```
+
+### Extension
+
+```bash
+npm run dev     # Development mode
+npm run build   # Production build
+npm run lint    # ESLint
+```
+
+---
+
+## ✅ Deployment Checklist
+
+### Backend (Render)
+
+- [ ] Code pushed to GitHub
+- [ ] Render web service created
+- [ ] All environment variables added
+- [ ] MongoDB connection working
+- [ ] Health endpoint responding
+- [ ] CORS includes frontend URL
+
+### Frontend (Vercel)
+
+- [ ] Project imported to Vercel
+- [ ] All environment variables added
+- [ ] Build succeeds
+- [ ] Backend API URL updated
+- [ ] Firebase auth working
+- [ ] Extension ID added
+
+### Extension
+
+- [ ] Built: `npm run build`
+- [ ] Extension ID copied
+- [ ] ID added to frontend .env
+- [ ] ID added to Firebase domains
+- [ ] Tested and working
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) file
+
+---
+
+## 📞 Support
+
+- 📧 Email: your-email@example.com
+- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/stash/issues)
+- 📖 Docs: `/docs` folder
+- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/stash/discussions)
+
+---
+
+## 🙏 Acknowledgments
+
+Built with: React, Node.js, Express, MongoDB, Firebase, Cloudinary, Tailwind CSS, Vite, JWT
+
+Inspired by: Pocket, Notion, Chrome Extension best practices
+
+---
+
+**Built with ❤️ | Version 1.0.0 | Last Updated: January 2026**
+
+⭐ **Star the repo if you find Stash helpful!**
+
+[⬆ Back to Top](#-stash---smart-content-management-system)
