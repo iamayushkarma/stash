@@ -21,14 +21,8 @@ export const UserProvider = ({ children }) => {
 
     // Set up listener for auth state changes - only for logout detection
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      console.log(
-        "🔥 onAuthStateChanged fired, firebaseUser:",
-        firebaseUser?.email
-      );
-
       // If no Firebase user and we're not on initial load, user logged out
       if (!firebaseUser && !isInitialLoad) {
-        console.log("❌ Firebase user signed out, clearing app user");
         setUser(null);
         localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
@@ -41,9 +35,6 @@ export const UserProvider = ({ children }) => {
       if (firebaseUser) {
         const stored = localStorage.getItem("user");
         if (stored && JSON.parse(stored)._id) {
-          console.log(
-            "✅ User in localStorage, context already updated by button"
-          );
           // Context was already updated by button's login() call
         }
       }

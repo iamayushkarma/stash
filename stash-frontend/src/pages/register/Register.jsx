@@ -27,7 +27,6 @@ function Register() {
 
   const getApiUrl = () => {
     const hostname = window.location.hostname;
-    console.log("window.location.hostname", hostname);
     const port = import.meta.env.VITE_BACKEND_API_PORT;
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return `http://localhost:${port}/api/v1/`;
@@ -37,19 +36,14 @@ function Register() {
   };
 
   const API_BASE_URL = getApiUrl();
-  console.log(API_BASE_URL);
 
   const onSubmit = async function (data) {
     try {
       const response = await axios.post(`${API_BASE_URL}auth/register`, data, {
         withCredentials: true,
       });
-      console.log("Response data:", response.data);
       const responseData = response.data.data;
       const { user, accessToken, refreshToken } = responseData;
-      console.log("Access Token:", accessToken);
-      console.log("Refresh Token:", refreshToken);
-      console.log("User Info:", user);
       login({
         ...user,
         accessToken,

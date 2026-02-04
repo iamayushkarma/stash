@@ -46,22 +46,17 @@ function App() {
   };
 
   const fetchCategories = async () => {
-    console.log("Debug 1: Attempting to fetch categories...");
-
     try {
       const { token } = await chrome.storage.local.get("token");
       if (!token) {
-        console.log("Debug 2: No token found. Aborting fetch.");
         return;
       }
-      console.log("Debug 2: Token found, proceeding with fetch.");
 
       const response = await fetch(`${serverUrl}api/v1/stashes/categories`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Debug 3: API response received.", response);
 
       if (!response.ok) {
         throw new Error(
@@ -70,10 +65,6 @@ function App() {
       }
 
       const categories = await response.json();
-      console.log(
-        "Debug 4: Categories successfully fetched from DB:",
-        categories
-      );
 
       setOptions(categories);
     } catch (error) {

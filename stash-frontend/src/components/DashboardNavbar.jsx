@@ -3,7 +3,6 @@ import { ToggleMode } from "../utils/ui/Buttons/ThemeToggleBtn";
 
 function DashboardNavbar() {
   const { user } = useUserContext();
-  console.log(user);
   return (
     <nav className="w-full top-0 h-12 px-6 gap-2 justify-end items-center flex bg-bg-light-secondary dark:bg-bg-dark-secondary text-text-light-primary dark:text-text-dark-primary border-b-[.5px] border-border-light dark:border-border-dark">
       {/* theme toggle */}

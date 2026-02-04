@@ -49,12 +49,8 @@ function Login() {
       const response = await axios.post(`${API_BASE_URL}auth/login`, data, {
         withCredentials: true,
       });
-      console.log("Response data:", response.data);
       const responseData = response.data.data;
       const { user, accessToken, refreshToken } = responseData;
-      console.log("Access Token:", accessToken);
-      console.log("Refresh Token:", refreshToken);
-      console.log("User Info:", user);
       login({
         ...user,
         accessToken,

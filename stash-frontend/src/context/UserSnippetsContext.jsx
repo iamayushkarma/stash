@@ -48,7 +48,6 @@ export const UserSnippetContextProvider = ({ children }) => {
         const data = response.data;
         setSnippets(data);
         setAllSnippets(data);
-        console.log("User data", data);
 
         // Calculate stats based on the initial fetch
         setStats(calculateStats(data));

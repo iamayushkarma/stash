@@ -45,7 +45,6 @@ export const UserTextSnippetContextProvider = ({ children }) => {
         const data = response.data;
         setSnippets(data);
         setAllSnippets(data);
-        console.log("Text data", data);
 
         setStats(calculateStats(data));
       } catch (error) {

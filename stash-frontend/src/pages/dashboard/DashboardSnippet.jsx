@@ -180,7 +180,6 @@ function DashboardHome() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSnippets(response.data);
-        console.log("search result", response.data);
       } catch (error) {
         console.error("Error fetching snippets:", error);
       } finally {
