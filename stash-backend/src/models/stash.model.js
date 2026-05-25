@@ -13,7 +13,6 @@ const stashSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: true,
     },
     // This field will be either 'text' or 'image'
     type: {

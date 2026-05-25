@@ -32,7 +32,7 @@ const saveStash = asyncHandler(async (req, res) => {
         .status(400)
         .json({ message: "Please select some content. It cannot be empty." });
     }
-    if (!title || !category || !type) {
+    if (!title || !type) {
       return res.status(400).json({ message: "Missing required fields" });
     }
     let finalContent = content;
