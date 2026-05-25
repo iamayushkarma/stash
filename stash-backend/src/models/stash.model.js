@@ -23,7 +23,6 @@ const stashSchema = new mongoose.Schema(
     },
     sourceUrl: {
       type: String,
-      required: true,
     },
     // This field will store either the selected text or the image URL
     content: {

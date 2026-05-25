@@ -10,6 +10,7 @@ import {
   ChevronUp,
   ChevronDown,
   X,
+  Plus,
 } from "lucide-react";
 import "../../App.css";
 import "./dashboard.css";
@@ -53,6 +54,17 @@ function DashboardHome() {
   const [isFetching, setIsFetching] = useState(true);
   const [editingSnippetId, setEditingSnippetId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+  // add snippet modal
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addSnippetType, setAddSnippetType] = useState("text");
+  const [addFormData, setAddFormData] = useState({
+    title: "",
+    category: "",
+    content: "",
+    note: "",
+    sourceUrl: "",
+  });
+  const [isAdding, setIsAdding] = useState(false);
 
   //- functional code
 
@@ -108,6 +120,47 @@ function DashboardHome() {
   const handleFormInputChange = (e) => {
     const { name, value } = e.target;
     setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  // add new snippet
+  const handleAddSnippet = async () => {
+    if (!addFormData.title || !addFormData.content) {
+      alert("Title and content are required.");
+      return;
+    }
+    try {
+      setIsAdding(true);
+      const token = localStorage.getItem("accessToken");
+
+      // POST the new snippet
+      await axios.post(
+        `${serverUrl}stashes`,
+        { ...addFormData, type: addSnippetType },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Refetch the full list so state, stats, and sidebar all stay in sync
+      const { data } = await axios.get(`${serverUrl}stashes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSnippets(data);
+      setStats(calculateStats(data));
+
+      // Reset and close
+      setIsAddModalOpen(false);
+      setAddFormData({
+        title: "",
+        category: "",
+        content: "",
+        note: "",
+        sourceUrl: "",
+      });
+      setAddSnippetType("text");
+    } catch (err) {
+      console.error("Failed to add snippet:", err);
+      alert("Error: Could not add the snippet.");
+    } finally {
+      setIsAdding(false);
+    }
   };
   const handleUpdateSnippet = async (id) => {
     try {
@@ -235,7 +288,14 @@ function DashboardHome() {
               <div className="md:w-1/2 font-semibold text-[.9rem] md:text-[1rem]">
                 Your Collection
               </div>
-              <div className=" md:w-1/2 flex items-center justify-end gap-4">
+              <div className="md:w-1/2 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="flex items-center gap-1 bg-primary text-white text-[.85rem] px-2.5 py-1 rounded-md hover:bg-blue-500 transition-all duration-150 cursor-pointer"
+                >
+                  <Plus className="w-3.5" />
+                  <span className="hidden sm:inline">Add Snippet</span>
+                </button>
                 <div className="flex items-center relative">
                   <input
                     className="border-[0.5px] rounded-md border-border-light dark:border-border-dark px-2 py-1 md:pr-8"
@@ -527,6 +587,26 @@ function DashboardHome() {
         handleDelete={handleDelete}
         snippetId={snippetToDelete}
       />
+      <AddSnippetModal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setAddFormData({
+            title: "",
+            category: "",
+            content: "",
+            note: "",
+            sourceUrl: "",
+          });
+          setAddSnippetType("text");
+        }}
+        snippetType={addSnippetType}
+        setSnippetType={setAddSnippetType}
+        formData={addFormData}
+        setFormData={setAddFormData}
+        onSubmit={handleAddSnippet}
+        isAdding={isAdding}
+      />
     </div>
   );
 }
@@ -646,5 +726,197 @@ const SyntexHighliter = ({ text }) => {
     >
       <code>{text}</code>
     </pre>
+  );
+};
+const AddSnippetModal = ({
+  isOpen,
+  onClose,
+  snippetType,
+  setSnippetType,
+  formData,
+  setFormData,
+  onSubmit,
+  isAdding,
+}) => {
+  const firstInputRef = useRef(null);
+
+  // close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [isOpen, onClose]);
+
+  // lock body scroll while open & auto-focus first input
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = "hidden";
+    setTimeout(() => firstInputRef.current?.focus(), 50);
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // stop clicks inside the panel from closing the modal
+  const handlePanelClick = (e) => e.stopPropagation();
+
+  const inputCls =
+    "w-full px-3 py-2 rounded-lg border-[0.5px] border-border-light dark:border-border-dark bg-bg-light-primary dark:bg-bg-dark-primary text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary text-[.9rem] outline-none focus:border-primary transition-colors duration-150 cursor-text";
+
+  return createPortal(
+    isOpen && (
+      // backdrop — click outside closes
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-snippet-title"
+        className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        {/* dim overlay */}
+        <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]" />
+
+        {/* panel */}
+        <div
+          onClick={handlePanelClick}
+          className="relative z-10 w-full max-w-md rounded-xl bg-bg-light-secondary dark:bg-bg-dark-secondary border-[0.5px] border-border-light dark:border-border-dark shadow-custom-heavy flex flex-col"
+        >
+          {/* ── Header ── */}
+          <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-border-light dark:border-border-dark">
+            <h2
+              id="add-snippet-title"
+              className="font-semibold text-[1rem] text-text-light-primary dark:text-text-dark-primary"
+            >
+              Add Snippet
+            </h2>
+            <button
+              onClick={onClose}
+              aria-label="Close modal"
+              className="cursor-pointer p-1 rounded-md text-text-light-secondary dark:text-text-dark-secondary hover:text-error dark:hover:text-error hover:bg-bg-light-primary dark:hover:bg-bg-dark-primary transition-all duration-150"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* ── Type toggle ── */}
+          <div className="flex gap-2 px-5 pt-4">
+            <button
+              onClick={() => setSnippetType("text")}
+              className={`cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[.85rem] border-[0.5px] font-medium transition-all duration-150 ${
+                snippetType === "text"
+                  ? "bg-primary border-primary text-white"
+                  : "border-border-light dark:border-border-dark text-text-light-secondary dark:text-text-dark-secondary hover:border-primary hover:text-primary dark:hover:text-primary"
+              }`}
+            >
+              <MdTextFields size={15} />
+              Text
+            </button>
+            <button
+              onClick={() => setSnippetType("image")}
+              className={`cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[.85rem] border-[0.5px] font-medium transition-all duration-150 ${
+                snippetType === "image"
+                  ? "bg-primary border-primary text-white"
+                  : "border-border-light dark:border-border-dark text-text-light-secondary dark:text-text-dark-secondary hover:border-primary hover:text-primary dark:hover:text-primary"
+              }`}
+            >
+              <FileImage size={15} />
+              Image
+            </button>
+          </div>
+
+          {/* ── Form fields ── */}
+          <div className="px-5 py-4 flex flex-col gap-3">
+            <input
+              ref={firstInputRef}
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Title *"
+              className={inputCls}
+            />
+            <input
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              placeholder="Category"
+              className={inputCls}
+            />
+
+            {snippetType === "text" ? (
+              <textarea
+                name="content"
+                value={formData.content}
+                onChange={handleChange}
+                placeholder="Content *"
+                rows={5}
+                className={`${inputCls} resize-none`}
+              />
+            ) : (
+              <>
+                <input
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  placeholder="Image URL * (https://...)"
+                  className={inputCls}
+                />
+                {formData.content && (
+                  <img
+                    src={formData.content}
+                    alt="preview"
+                    className="w-full max-h-36 object-cover rounded-lg border-[0.5px] border-border-light dark:border-border-dark"
+                    onError={(e) => (e.target.style.display = "none")}
+                    onLoad={(e) => (e.target.style.display = "block")}
+                  />
+                )}
+              </>
+            )}
+
+            <input
+              name="note"
+              value={formData.note}
+              onChange={handleChange}
+              placeholder="Note (optional)"
+              className={inputCls}
+            />
+            <input
+              name="sourceUrl"
+              value={formData.sourceUrl}
+              onChange={handleChange}
+              placeholder="Source URL (optional)"
+              className={inputCls}
+            />
+          </div>
+
+          {/* ── Footer ── */}
+          <div className="flex items-center justify-end gap-3 px-5 pb-5 border-t-[0.5px] border-border-light dark:border-border-dark pt-4">
+            <button
+              onClick={onClose}
+              className="cursor-pointer text-[.9rem] px-3 py-1.5 rounded-lg border-[0.5px] border-border-light dark:border-border-dark text-text-light-secondary dark:text-text-dark-secondary hover:border-primary hover:text-primary dark:hover:text-primary transition-all duration-150"
+            >
+              Cancel
+            </button>
+            <Button
+              onClick={onSubmit}
+              text={isAdding ? "Adding..." : "Add Snippet"}
+              className={
+                isAdding
+                  ? "opacity-70 pointer-events-none cursor-not-allowed!"
+                  : "cursor-pointer!"
+              }
+            />
+          </div>
+        </div>
+      </div>
+    ),
+    document.getElementById("delete-confirmation-modal-portal")
   );
 };
