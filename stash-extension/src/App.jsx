@@ -24,11 +24,18 @@ function App() {
   const [options, setOptions] = useState([]);
   const [sourceUrl, setSourceUrl] = useState("");
 
+  // Get the shadow DOM container (for dark mode class toggling)
   const getRootElement = () => {
-    return (
-      document.getElementById("react-chrome-extension-root") ||
-      document.getElementById("root")
-    );
+    const host = document.getElementById("react-chrome-extension-root");
+    if (host?.shadowRoot) {
+      return host.shadowRoot.getElementById("stash-shadow-container");
+    }
+    return document.getElementById("root");
+  };
+
+  // Get the host element (for show/hide toggling)
+  const getHostElement = () => {
+    return document.getElementById("react-chrome-extension-root");
   };
 
   const getHostname = (url) => {
@@ -115,7 +122,8 @@ function App() {
             fetchCategories();
 
             // Make sure the modal is visible
-            if (rootElement) rootElement.style.display = "block";
+            const hostEl = getHostElement();
+            if (hostEl) hostEl.style.display = "block";
           }
         });
       } else {
@@ -222,9 +230,9 @@ function App() {
     }
   };
   const handleClose = () => {
-    const rootElement = getRootElement();
-    if (rootElement && rootElement.id === "react-chrome-extension-root") {
-      rootElement.style.display = "none";
+    const hostEl = getHostElement();
+    if (hostEl) {
+      hostEl.style.display = "none";
     }
   };
   return (

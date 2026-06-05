@@ -49,10 +49,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       (results) => {
         if (chrome.runtime.lastError || !results || !results[0]) return;
         if (!results[0].result) {
-          chrome.scripting.insertCSS({
-            target: { tabId: tab.id },
-            files: ["content.css"],
-          });
           chrome.scripting.executeScript({
             target: { tabId: tab.id },
             files: ["content.js"],
