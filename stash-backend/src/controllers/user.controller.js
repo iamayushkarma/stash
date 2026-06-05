@@ -115,7 +115,7 @@ const loginUser = asyncHandler(async (req, res) => {
 // user login with google
 const loginWithGoogle = asyncHandler(async (req, res) => {
   try {
-    console.log("📱 Google login request received:", req.body);
+    console.log("Google login request received:", req.body);
     const { name, email, googleId } = req.body;
     if (!email || !googleId) {
       throw new ApiError(400, "Email and Google ID are required!");
@@ -132,9 +132,9 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
         authType: "google",
         googleId,
       });
-      console.log("✅ New user created:", user._id);
+      console.log("New user created:", user._id);
     } else {
-      console.log("✅ Existing user found:", user._id);
+      console.log("Existing user found:", user._id);
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(

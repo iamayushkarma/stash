@@ -169,10 +169,9 @@ function App() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!title || !category) {
-      setError({ bothFeild: "Please fill in both title and category." });
-      // toast.success("Saved successfully!");
-      cerateToast("error", "you are not logged in!");
+    if (!title) {
+      setError({ bothFeild: "Please enter a title." });
+      cerateToast("error", "Please enter a title.");
       return;
     }
     setIsSaving(true);
